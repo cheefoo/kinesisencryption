@@ -1,10 +1,10 @@
 # kinesisencryption
 Encrypting records with AWS KMS before sending to Kinesis Endpoint, Decrypting consumed records using AWS KMS
 
-#Demo to demonstrate the use of KMS to send encrypt records before sending to a Kinesis Stream and to also decrypt records consumed from the stream
+Demo to demonstrate the use of KMS to encrypt records before sending to a Kinesis Stream and to also decrypt records consumed from the stream
 The default AWS region used here is us-east-1 
 A file containing car data (car_odom1.txt) is read by the producer at startup and is reloaded several times to simulate streaming data.
-To use this application.
+#To use this application.
 1. Create a stream in US_EAST_1 
 2. Create a KMS Key in US_EAST as well
 3. Clone the repository
