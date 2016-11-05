@@ -6,7 +6,7 @@ The default AWS region used here is us-east-1
 A file containing car data (car_odom1.txt) is read by the producer at startup and is reloaded several times to simulate streaming data.
 #To use this application.
 1. Create a stream in US_EAST_1 
-2. Create a KMS Key in US_EAST as well
+2. Create a KMS Key in US_EAST_1 as well
 3. Clone the repository
 git clone https://github.com/cheefoo/kinesisencryption.git
 4. navigate to the resources folder kinesisencryption/src/main/resources/app.properties
