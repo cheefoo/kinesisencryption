@@ -20,4 +20,4 @@ out_file_path=<>
 7. Startup the consumer
  mvn exec:java -Dexec.mainClass=com.tayo.KinesisEncryption.EncryptedConsumerWithStreams
 8. Startup the producer
- mvn exec:java -Dexec.mainClass=com.tayo.KinesisEncryption.EncryptedConsumerWithStreams
+ mvn exec:java -Dexec.mainClass=com.tayo.KinesisEncryption.EncryptedProducerWithStreams
