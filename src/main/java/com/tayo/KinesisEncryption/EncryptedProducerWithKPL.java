@@ -33,8 +33,9 @@ public class EncryptedProducerWithKPL
 	private static final Logger log = LoggerFactory.getLogger(EncryptedProducerWithKPL.class);
 	private static final String filePath = "C:\\Users\\temitayo\\workspace\\kinesisbootcamp\\car_odom1.txt";
 	private static final String DELIM = ",";
-	public static final String STREAM_NAME = "EncryptedStream";
+	public static final String STREAM_NAME = "stream_name";
 	public static final String KPL_TMP_DIR = "C:\\Users\\temitayo\\workspace\\KinesisEncryption\\bin";
+	public static final String KEY_ID = "key_id";
 	
 	public static KinesisProducer getKinesisProducer() 
 	{
@@ -49,6 +50,7 @@ public class EncryptedProducerWithKPL
 	{
 		KinesisProducer producer = getKinesisProducer();
 		
+    	
 		List<BootCarObject> cars = getDataObjects();
 		final FutureCallback<UserRecordResult> callback = new FutureCallback<UserRecordResult>() {
             @Override
@@ -70,23 +72,27 @@ public class EncryptedProducerWithKPL
                 log.info("Success");;
             }
         };
-		for(BootCarObject car: cars)
+        
+        try
+        {
+        	String streamName = KinesisEncryptionUtils.getProperties().getProperty(STREAM_NAME);
+        	String keyId = KinesisEncryptionUtils.getProperties().getProperty(KEY_ID);
+        	for(BootCarObject car: cars)
+    		{
+    			
+    				//ByteBuffer data = ByteBuffer.wrap(String.format(car.toString()).getBytes("UTF-8"));
+    				ByteBuffer data = KinesisEncryptionUtils.toByteStream(car, keyId);
+    				ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
+    				Futures.addCallback(f, callback);
+    				log.info("record added :");
+    			
+    		}
+        }
+		catch(Exception e)
 		{
-			try
-			{
-				//ByteBuffer data = ByteBuffer.wrap(String.format(car.toString()).getBytes("UTF-8"));
-				ByteBuffer data = ByteBuffer.wrap(String.format(car.encryptedToString()).getBytes("UTF-8"));
-				ListenableFuture<UserRecordResult> f = producer.addUserRecord(STREAM_NAME, randomPartitionKey(), data);
-				Futures.addCallback(f, callback);
-				log.info("record added :");
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-			
-			
+			e.printStackTrace();
 		}
+		
 	       
 	}
 	

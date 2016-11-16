@@ -62,7 +62,7 @@ public class DecryptShardConsumerThread implements Runnable
 		while (true) 
 		{		
 		  GetRecordsRequest getRecordsRequest = new GetRecordsRequest();
-		  getRecordsRequest.setShardIterator(shardIterator);
+		  getRecordsRequest.setShardIterator(this.getShardIterator());
 		  getRecordsRequest.setLimit(1000); 
 		  GetRecordsResult result = kinesis.getRecords(getRecordsRequest);		  
 		  records = result.getRecords();
@@ -96,7 +96,8 @@ public class DecryptShardConsumerThread implements Runnable
 		  {
 		    throw new RuntimeException(exception);
 		  }
-		shardIterator = result.getNextShardIterator();	
+		shardIterator = result.getNextShardIterator();
+		this.setShardIterator(shardIterator);
 	   }		
 		
 	}

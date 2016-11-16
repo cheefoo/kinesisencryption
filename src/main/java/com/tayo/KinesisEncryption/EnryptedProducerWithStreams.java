@@ -76,7 +76,8 @@ public class EnryptedProducerWithStreams
                  		break;
                  	}
                  	PutRecordsRequestEntry ptre = new PutRecordsRequestEntry();
-                 	ptre.setData(car.toByteStream()); 	
+                 	//ptre.setData(car.toByteStream()); 
+                 	ptre.setData(KinesisEncryptionUtils.toByteStream(car, keyId));
                  	ptre.setPartitionKey(randomPartitionKey());
                  	ptreList.add(ptre);
                  	log.info("Car added :" + car.toString() + "Car Cipher :" + car.toByteStream(keyId));
