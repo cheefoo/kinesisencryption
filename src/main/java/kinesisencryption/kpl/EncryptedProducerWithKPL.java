@@ -1,4 +1,4 @@
-package com.tayo.KinesisEncryption;
+package kinesisencryption.kpl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import kinesisencryption.dao.BootCarObject;
+import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,27 +33,23 @@ import com.google.common.util.concurrent.ListenableFuture;
 public class EncryptedProducerWithKPL 
 {
 	private static final Logger log = LoggerFactory.getLogger(EncryptedProducerWithKPL.class);
-	private static final String filePath = "C:\\Users\\temitayo\\workspace\\kinesisbootcamp\\car_odom1.txt";
 	private static final String DELIM = ",";
-	public static final String STREAM_NAME = "stream_name";
-	public static final String KPL_TMP_DIR = "C:\\Users\\temitayo\\workspace\\KinesisEncryption\\bin";
-	public static final String KEY_ID = "key_id";
+
 	
 	public static KinesisProducer getKinesisProducer() 
 	{
 		KinesisProducerConfiguration config = KinesisProducerConfiguration.fromPropertiesFile("default_config.properties");
 		config.setCredentialsProvider(new DefaultAWSCredentialsProviderChain());
-		config.setTempDirectory(KPL_TMP_DIR);
 		return new KinesisProducer(config);
 	}
 
 	
-	public static void main (String [] args)
+	public static void main (String [] args) throws IOException
 	{
 		KinesisProducer producer = getKinesisProducer();
 		
-    	
-		List<BootCarObject> cars = getDataObjects();
+    	 String filePath = KinesisEncryptionUtils.getProperties().getProperty("file_path");
+		List<BootCarObject> cars = getDataObjects(filePath);
 		final FutureCallback<UserRecordResult> callback = new FutureCallback<UserRecordResult>() {
             @Override
             public void onFailure(Throwable t) {
@@ -69,22 +67,23 @@ public class EncryptedProducerWithKPL
 
             @Override
             public void onSuccess(UserRecordResult result) {
-                log.info("Success");;
+                log.info("Success");
             }
         };
         
         try
         {
-        	String streamName = KinesisEncryptionUtils.getProperties().getProperty(STREAM_NAME);
-        	String keyId = KinesisEncryptionUtils.getProperties().getProperty(KEY_ID);
+        	String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
+        	String keyId = KinesisEncryptionUtils.getProperties().getProperty("key_id");
         	for(BootCarObject car: cars)
     		{
     			
-    				//ByteBuffer data = ByteBuffer.wrap(String.format(car.toString()).getBytes("UTF-8"));
+    				log.info("Before encryption record is "+ car  );
     				ByteBuffer data = KinesisEncryptionUtils.toByteStream(car, keyId);
     				ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
+
     				Futures.addCallback(f, callback);
-    				log.info("record added :");
+    				log.info("Encrypted record " + data.toString() + " " + "added successfully");
     			
     		}
         }
@@ -100,9 +99,10 @@ public class EncryptedProducerWithKPL
     {
         return new BigInteger(128, new Random()).toString(10);
     }
-	public static  List<BootCarObject> getDataObjects()
+	public static  List<BootCarObject> getDataObjects(String filePath)
 	{
 		List<BootCarObject> carObjectList= new ArrayList<BootCarObject>();
+
 		try 
 		{
 			FileInputStream fis = new FileInputStream(new File(filePath));
@@ -110,8 +110,7 @@ public class EncryptedProducerWithKPL
 	    	String line = null;
 	    	while ((line = br.readLine()) != null)
 	    	{
-	        	System.out.println("Line put in stream is " + line);
-	        	String [] tokens = line.split(DELIM);
+				String [] tokens = line.split(DELIM);
 	        	BootCarObject car = new BootCarObject(tokens[0], tokens[1], tokens[2]);
 	        	carObjectList.add(car);
 	    	}

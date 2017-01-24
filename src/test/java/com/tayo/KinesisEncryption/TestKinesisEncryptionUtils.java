@@ -8,7 +8,9 @@ import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import kinesisencryption.dao.BootCarObject;
+import kinesisencryption.utils.KinesisEncryptionUtils;
+
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -66,7 +68,7 @@ public class TestKinesisEncryptionUtils extends TestCase
 			
 	}
 	
-	@Test
+
 	public void testToByteStream() throws UnsupportedEncodingException
 	{		
 		ByteBuffer encryptedData = KinesisEncryptionUtils.toByteStream(car, keyId);

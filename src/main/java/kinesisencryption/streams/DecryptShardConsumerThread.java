@@ -1,4 +1,4 @@
-package com.tayo.KinesisEncryption;
+package kinesisencryption.streams;
 
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -23,17 +23,22 @@ public class DecryptShardConsumerThread implements Runnable
 {
 	private String shardIterator;
 	private String shardId;
-	private AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
+	private AmazonKinesisClient kinesis;
+	private AWSKMSClient kms;
+	/*private AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
 			.getCredentials()).withRegion(Regions.US_EAST_1);
 	private AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
-			.getCredentials()).withRegion(Regions.US_EAST_1);
+			.getCredentials()).withRegion(Regions.US_EAST_1);*/
 	private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	private static final Logger log = LoggerFactory.getLogger(DecryptShardConsumerThread.class);
 	
-	public DecryptShardConsumerThread(String shardIterator, String shardId)
+	public DecryptShardConsumerThread(String shardIterator, String shardId, AmazonKinesisClient kinesis, AWSKMSClient kms )
 	{
 		this.shardIterator = shardIterator;
 		this.shardId = shardId;
+		this.kms= kms;
+		this.kinesis = kinesis;
+
 	}
 	public String getShardIterator()
 	{

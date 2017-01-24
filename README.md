@@ -18,6 +18,6 @@ stream_name=<Your Stream Name>
 out_file_path=<>
 6.Navigate to the root of your codebase
 7. Startup the consumer
- mvn exec:java -Dexec.mainClass=com.tayo.KinesisEncryption.EncryptedConsumerWithStreams
+ mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams
 8. Startup the producer
  mvn exec:java -Dexec.mainClass=com.tayo.KinesisEncryption.EncryptedProducerWithStreams

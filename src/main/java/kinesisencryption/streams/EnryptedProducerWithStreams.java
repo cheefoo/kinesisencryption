@@ -1,4 +1,4 @@
-package com.tayo.KinesisEncryption;
+package kinesisencryption.streams;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,6 +11,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import kinesisencryption.dao.BootCarObject;
+import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +27,9 @@ import com.amazonaws.services.kinesis.model.PutRecordsResult;
 
 public class EnryptedProducerWithStreams 
 {
-	private static final String filePath = "file_path";
+
 	private static final String DELIM = ",";
-	public static final String STREAM_NAME = "stream_name";
-	public static final String KEY_ID = "key_id";
+
 	private static final Logger log = LoggerFactory.getLogger(EnryptedProducerWithStreams.class);
 	private List<BootCarObject> carObjectList;
 	
@@ -54,8 +56,8 @@ public class EnryptedProducerWithStreams
         	List<BootCarObject> cars = getDataObjects();
         	EnryptedProducerWithStreams producer = new EnryptedProducerWithStreams();
         	producer.setCarObjectList(cars);
-        	String streamName = KinesisEncryptionUtils.getProperties().getProperty(STREAM_NAME);
-        	String keyId = KinesisEncryptionUtils.getProperties().getProperty(KEY_ID);
+        	String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
+        	String keyId = KinesisEncryptionUtils.getProperties().getProperty("key_id");
             PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
             
             List<PutRecordsRequestEntry> ptreList = new ArrayList<PutRecordsRequestEntry>();
@@ -104,7 +106,7 @@ public class EnryptedProducerWithStreams
 	{
 		List<BootCarObject> carObjectList= new ArrayList<BootCarObject>();
 		
-			FileInputStream fis = new FileInputStream(new File(KinesisEncryptionUtils.getProperties().getProperty(filePath)));
+			FileInputStream fis = new FileInputStream(new File(KinesisEncryptionUtils.getProperties().getProperty("file_path")));
 	    	BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 	    	String line = null;
 	    	while ((line = br.readLine()) != null)

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.tayo.KinesisEncryption;
+package kinesisencryption.kpl;
 
 import com.amazonaws.services.kinesis.producer.UserRecordResult;
 import com.google.common.util.concurrent.FutureCallback;
