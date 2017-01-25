@@ -31,11 +31,21 @@ public class KinesisEncryptionUtils
 
         return prop;
 	}
-	
-	public static ByteBuffer toByteStream(BootCarObject car, String keyId) throws UnsupportedEncodingException
+
+	/*public static ByteBuffer toByteStream(BootCarObject car, String keyId) throws UnsupportedEncodingException
 	{
-		AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
-    			.getCredentials()).withRegion(Regions.US_EAST_1);
+	AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
+			.getCredentials()).withRegion(Regions.US_EAST_1);
+	EncryptRequest request = new EncryptRequest()
+			.withKeyId(keyId)
+			.withPlaintext(ByteBuffer.wrap(String.format(car.toString()).getBytes("UTF-8")));
+	EncryptResult result = kms.encrypt(request);
+	return result.getCiphertextBlob();
+	}*/
+
+	public static ByteBuffer toByteStream(AWSKMSClient kms, BootCarObject car, String keyId) throws UnsupportedEncodingException
+	{
+
 		EncryptRequest request = new EncryptRequest()
 				.withKeyId(keyId)
 				.withPlaintext(ByteBuffer.wrap(String.format(car.toString()).getBytes("UTF-8")));

@@ -71,7 +71,7 @@ public class TestKinesisEncryptionUtils extends TestCase
 
 	public void testToByteStream() throws UnsupportedEncodingException
 	{		
-		ByteBuffer encryptedData = KinesisEncryptionUtils.toByteStream(car, keyId);
+		ByteBuffer encryptedData = KinesisEncryptionUtils.toByteStream(kms, car, keyId);
 		PutRecordRequest putRecordRequest = new PutRecordRequest();
 		putRecordRequest.setData(encryptedData);
 		putRecordRequest.setPartitionKey(String.valueOf(System.currentTimeMillis()));

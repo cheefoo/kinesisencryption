@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
@@ -46,8 +47,9 @@ public class EnryptedProducerWithStreams
 	public static void main (String [] args) throws UnsupportedEncodingException, InterruptedException
 	{
 		AmazonKinesisClient kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
-    			.getCredentials()).withRegion(Regions.US_EAST_1);
-        
+    			.getCredentials());
+		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
+				.getCredentials());
 		
        /*
         * Simulating the appearance of a steady flow of data by continuously loading data from file*/
@@ -57,8 +59,17 @@ public class EnryptedProducerWithStreams
         	EnryptedProducerWithStreams producer = new EnryptedProducerWithStreams();
         	producer.setCarObjectList(cars);
         	String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
+			log.info("Successfully retrieved stream name property " + streamName);
         	String keyId = KinesisEncryptionUtils.getProperties().getProperty("key_id");
-            PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
+			log.info("Successfully retrieved key id property " + keyId);
+			String kinesisEndpoint = KinesisEncryptionUtils.getProperties().getProperty("kinesis_endpoint");
+			log.info("Successfully retrieved kinesis endpoint property " + kinesisEndpoint);
+			kinesis.setEndpoint(kinesisEndpoint);
+			String kmsEndpoint = KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint");
+			log.info("Successfully retrieved kms endpoint property " + kmsEndpoint);
+			kms.setEndpoint(kmsEndpoint);
+
+			PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
             
             List<PutRecordsRequestEntry> ptreList = new ArrayList<PutRecordsRequestEntry>();
             int batch = 1;
@@ -79,7 +90,7 @@ public class EnryptedProducerWithStreams
                  	}
                  	PutRecordsRequestEntry ptre = new PutRecordsRequestEntry();
                  	//ptre.setData(car.toByteStream()); 
-                 	ptre.setData(KinesisEncryptionUtils.toByteStream(car, keyId));
+                 	ptre.setData(KinesisEncryptionUtils.toByteStream(kms,car, keyId));
                  	ptre.setPartitionKey(randomPartitionKey());
                  	ptreList.add(ptre);
                  	log.info("Car added :" + car.toString() + "Car Cipher :" + car.toByteStream(keyId));

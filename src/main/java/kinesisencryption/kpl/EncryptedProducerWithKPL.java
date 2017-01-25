@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
@@ -48,9 +50,17 @@ public class EncryptedProducerWithKPL
 	{
 		KinesisProducer producer = getKinesisProducer();
 		String filePath = null;
+		String kmsEndpoint = null;
+		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
+				.getCredentials());
+
 		try
 		{
 			filePath = KinesisEncryptionUtils.getProperties().getProperty("file_path");
+			log.info("Successfully retrieved file path property " + filePath);
+			kmsEndpoint = KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint");
+			log.info("Successfully retrieved kms endpoint property " + kmsEndpoint);
+			kms.setEndpoint(kmsEndpoint);
 		}
 		catch( IOException ioe)
 		{
@@ -88,7 +98,7 @@ public class EncryptedProducerWithKPL
     		{
     			
     				log.info("Before encryption record is "+ car  );
-    				ByteBuffer data = KinesisEncryptionUtils.toByteStream(car, keyId);
+    				ByteBuffer data = KinesisEncryptionUtils.toByteStream(kms, car, keyId);
     				ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
 
     				Futures.addCallback(f, callback);
