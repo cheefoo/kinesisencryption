@@ -153,18 +153,19 @@ aws kms create-key
                                            |
 
 6.Navigate to the root of your codebase 
+
 ```
 cd kinesisencryption
 ```
 
-7. Startup the Streams consumer
+7.Startup the Streams consumer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams > ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log" &  
  
-8. Startup the Streams producer
+8.Startup the Streams producer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EnryptedProducerWithStreams > ~/kinesisencryption/logs/EnryptedProducerWithStreams.log) &> ~/kinesisencryption/logs/EnryptedProducerWithStreams.log" & 
  
-9. Startup the KCL consumer
+9.Startup the KCL consumer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kcl.EncryptedConsumerWithKCL > ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log" &  
  
-10. Startup the KPL producer
+10.Startup the KPL producer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kpl.EncryptedProducerWithKPL > ~/kinesisencryption/logs/EncryptedProducerWithKPL.log) &> ~/kinesisencryption/logs/EncryptedProducerWithKPL.log" &  
