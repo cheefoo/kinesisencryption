@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,7 +45,7 @@ public class EnryptedProducerWithStreams
 		this.carObjectList = carObjectList;
 	}
 	
-	public static void main (String [] args) throws UnsupportedEncodingException, InterruptedException
+	public static void main (String [] args)
 	{
 		AmazonKinesisClient kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
     			.getCredentials());
@@ -89,11 +90,12 @@ public class EnryptedProducerWithStreams
                  		break;
                  	}
                  	PutRecordsRequestEntry ptre = new PutRecordsRequestEntry();
-                 	//ptre.setData(car.toByteStream()); 
-                 	ptre.setData(KinesisEncryptionUtils.toByteStream(kms,car, keyId));
+                 	//ptre.setData(car.toByteStream());
+					ByteBuffer data  = KinesisEncryptionUtils.toByteStream(kms,car, keyId);
+                 	ptre.setData(data);
                  	ptre.setPartitionKey(randomPartitionKey());
                  	ptreList.add(ptre);
-                 	log.info("Car added :" + car.toString() + "Car Cipher :" + car.toByteStream(keyId));
+                 	log.info("Car added :" + car.toString() + "Car Cipher :" + data.toString());
                     i++;
                  }
                  ptreList = new ArrayList<PutRecordsRequestEntry>(); 
@@ -102,10 +104,14 @@ public class EnryptedProducerWithStreams
                  Thread.sleep(100);
              }
         }
-        catch(Exception e)
+        catch(IOException ioe)
         {
-        	log.error(e.toString());
-        }	
+        	log.error(ioe.toString());
+        }
+		catch (InterruptedException ie)
+		{
+			log.error(ie.toString());
+		}
 	}
 	
 	public static String randomPartitionKey() 
@@ -113,7 +119,7 @@ public class EnryptedProducerWithStreams
         return new BigInteger(128, new Random()).toString(10);
     }
 	
-	public static  List<BootCarObject> getDataObjects() throws FileNotFoundException, IOException
+	public static  List<BootCarObject> getDataObjects() throws  IOException
 	{
 		List<BootCarObject> carObjectList= new ArrayList<BootCarObject>();
 		
