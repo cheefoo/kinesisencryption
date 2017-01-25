@@ -8,7 +8,6 @@ import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.DescribeStreamResult;
 import com.amazonaws.services.kinesis.model.GetShardIteratorRequest;
@@ -22,7 +21,7 @@ public class EncryptedConsumerWithStreams
 	private static final Logger log = LoggerFactory.getLogger(EncryptedConsumerWithStreams.class);
 	//private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	
-	public static void main (String [] args) throws IOException
+	public static void main (String [] args) throws Exception
 	{
 		AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
     			.getCredentials());
@@ -34,6 +33,7 @@ public class EncryptedConsumerWithStreams
 		try
 		{
 			String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
+			log.info("Stream name from properties is " + streamName);
 			DescribeStreamResult streamResult = kinesis.describeStream(streamName);
 			StreamDescription streamDescription = streamResult.getStreamDescription();
 			List<Shard> shardList = streamDescription.getShards();
@@ -54,9 +54,10 @@ public class EncryptedConsumerWithStreams
 				consumerThread.start();
 		   }
 		}
-		catch(Exception e)
+		catch(IOException ioe)
 		{
-			log.error(e.getMessage());
+			log.error("Unable to load properties file" + ioe.getMessage());
+			throw new Exception (ioe.toString());
 		}
 		
 	}

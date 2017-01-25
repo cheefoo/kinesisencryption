@@ -44,11 +44,20 @@ public class EncryptedProducerWithKPL
 	}
 
 	
-	public static void main (String [] args) throws IOException
+	public static void main (String [] args) throws Exception
 	{
 		KinesisProducer producer = getKinesisProducer();
-		
-    	 String filePath = KinesisEncryptionUtils.getProperties().getProperty("file_path");
+		String filePath = null;
+		try
+		{
+			filePath = KinesisEncryptionUtils.getProperties().getProperty("file_path");
+		}
+		catch( IOException ioe)
+		{
+			log.error("Could not load properties file " + ioe.toString());
+			throw new Exception("Could not load properties file");
+		}
+
 		List<BootCarObject> cars = getDataObjects(filePath);
 		final FutureCallback<UserRecordResult> callback = new FutureCallback<UserRecordResult>() {
             @Override
