@@ -12,9 +12,9 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
 2. AWS CLI Installed and configured
 3. After following the steps in the Getting Started section, you will have set up the following resources:
   
-  3.1. An AWS kinesis Stream
-  3.2. One IAM role, Instance Profile and Policy required for the ec2 instance
-  3.3. One AWS EC2 Instance based on AmazonLinux with dependencies pre-installed
+    3.1.  An AWS kinesis Stream
+    3.2.  One IAM role, Instance Profile and Policy required for the ec2 instance
+    3.3.  One AWS EC2 Instance based on AmazonLinux with dependencies pre-installed
   
 4. When the KCL is initiated, a DynamoDB table is created
   
@@ -24,6 +24,10 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
 aws kinesis create-stream --stream-name 012417-Stream --shard-count 2 
 ```
 2. Create a KMS Key 
+```
+aws kms create-key 
+```
+
 3. Create the Kinesis IAM role required for EC2 Instances  
   ```
   aws iam create-role \  
