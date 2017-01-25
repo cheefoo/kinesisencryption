@@ -104,7 +104,6 @@ aws kms create-key
   #!/bin/bash  
   sudo yum install -y java-1.8.0-* git gcc-c++ make  
   sudo yum remove -y java-1.7.0-*  
-  curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -  
   cd /home/ec2-user   
   wget http://mirrors.whoishostingthis.com/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip  
   unzip apache-maven-3.3.9-bin.zip  
