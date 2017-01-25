@@ -25,10 +25,6 @@ public class DecryptShardConsumerThread implements Runnable
 	private String shardId;
 	private AmazonKinesisClient kinesis;
 	private AWSKMSClient kms;
-	/*private AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
-			.getCredentials()).withRegion(Regions.US_EAST_1);
-	private AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
-			.getCredentials()).withRegion(Regions.US_EAST_1);*/
 	private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	private static final Logger log = LoggerFactory.getLogger(DecryptShardConsumerThread.class);
 	
@@ -50,7 +46,17 @@ public class DecryptShardConsumerThread implements Runnable
 		this.shardIterator = shardIterator;
 	}
 
-	public String getShardId() 
+	public AWSKMSClient getKms()
+	{
+		return kms;
+	}
+
+	public AmazonKinesisClient getKinesis()
+	{
+		return kinesis;
+	}
+
+	public String getShardId()
 	{
 		return shardId;
 	}
@@ -69,7 +75,7 @@ public class DecryptShardConsumerThread implements Runnable
 		  GetRecordsRequest getRecordsRequest = new GetRecordsRequest();
 		  getRecordsRequest.setShardIterator(this.getShardIterator());
 		  getRecordsRequest.setLimit(1000); 
-		  GetRecordsResult result = kinesis.getRecords(getRecordsRequest);		  
+		  GetRecordsResult result = this.getKinesis().getRecords(getRecordsRequest);
 		  records = result.getRecords();
 		  if(records.size() > 0)
 		  {
@@ -80,10 +86,10 @@ public class DecryptShardConsumerThread implements Runnable
 						  /*
 						   * Now trying the KMS directly*/
 						 DecryptRequest decrypter = new DecryptRequest().withCiphertextBlob(record.getData());
-						 DecryptResult dresult = kms.decrypt(decrypter);
+						 DecryptResult dresult = this.getKms().decrypt(decrypter);
 						 log.info("Cipher Blob :" + record.getData().toString() + " : " + "Decrypted Text is :" 
 						 + decoder.decode(dresult.getPlaintext()).toString());
-						 //System.out.println(decoder.decode(dresult.getPlaintext()).toString());
+
 					 } 
 					 catch (CharacterCodingException e) 
 					 {
