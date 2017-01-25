@@ -63,7 +63,7 @@ aws kms create-key
       {  
           "Effect": "Allow",  
           "Action": ["kinesis:PutRecord","kinesis:PutRecords","kinesis:DescribeStream","kinesis:Get*"],  
-          "Resource": ["arn:aws:kinesis:us-east-1:111122223333:stream/12616-Stream"]  
+          "Resource": ["arn:aws:kinesis:us-east-1:111122223333:stream/012417-Stream"]  
       },
       {  
           "Sid": "Stmt1482832527000",  
@@ -79,15 +79,14 @@ aws kms create-key
       {  
           "Effect": "Allow",  
           "Action": ["dynamodb:CreateTable", "dynamodb:DescribeTable", "dynamodb:Scan", "dynamodb:PutItem",        "dynamodb:UpdateItem", "dynamodb:GetItem"],  
-          "Resource": ["arn:aws:dynamodb:us-east-1:111122223333:table/Centos*"]  
+          "Resource": ["arn:aws:dynamodb:us-east-1:111122223333:table/Encrypted*"]  
       },
       {
     "Effect": "Allow",
     "Action": ["kms:Encrypt","kms:Decrypt"],
     "Resource": [
-      "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
-      "arn:aws:kms:us-west-2:111122223333:key/0987dcba-09fe-87dc-65ba-ab0987654321"
-    ]
+      "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+      ]
   }
   ]  
   }'  
