@@ -12,18 +12,20 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
 2. AWS CLI Installed and configured
 3. After following the steps in the Getting Started section, you will have set up the following resources:
 3.1. An AWS kinesis Stream
-3.2. Two IAM roles, Instance Profiles and Policies required for the KCL and KPL instances
-3.3. Two AWS EC2 Instances based on AmazonLinux with dependencies pre-installed
-3.3. An RDS mysql database
-3.4. An Amazon S3 bucket
+3.2. One IAM role, Instance Profile and Policy required ec2 instance
+3.3. One AWS EC2 Instance based on AmazonLinux with dependencies pre-installed
+
 
 #To run the example application.
-1. Create a Kinesis stream i
+1. Create a Kinesis stream 
+```
+aws kinesis create-stream --stream-name 012417-Stream --shard-count 2 
+```
 2. Create a KMS Key 
-3. Create the Kinesis IAM roles required for EC2 Instances  
+3. Create the Kinesis IAM role required for EC2 Instances  
   ```
   aws iam create-role \  
-  --role-name 12616-KPLRole \  
+  --role-name 012417-EncryptionRole \  
   --assume-role-policy-document '  
   {  
       "Version": "2012-10-17",  
@@ -37,39 +39,22 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
       }]  
   }'  
 
-  aws iam create-role \  
-  --role-name 12616-KCLRole \  
-  --assume-role-policy-document '  
-  {  
-      "Version": "2012-10-17",  
-      "Statement": [{  
-          "Sid": "",  
-          "Effect": "Allow",  
-          "Principal": {  
-              "Service": "ec2.amazonaws.com"  
-          },  
-          "Action": "sts:AssumeRole"  
-      }]  
-  }'  
+  aws iam create-instance-profile --instance-profile-name 012417-EncryptionRole  
 
-  aws iam create-instance-profile --instance-profile-name 12616-KCLRole  
-
-  aws iam create-instance-profile --instance-profile-name 12616-KPLRole  
-
-  aws iam add-role-to-instance-profile --instance-profile-name 12616-KPLRole --role-name 12616-KPLRole  
-
-  aws iam add-role-to-instance-profile --instance-profile-name 12616-KCLRole --role-name 12616-KCLRole  
-  ```
-4. Create the Kinesis IAM Policies  (Please replace the account ids with your own account id)
+  aws iam add-role-to-instance-profile --instance-profile-name 012417-EncryptionRole  --role-name 012417-EncryptionRole 
+   ```
+4. Create the Kinesis IAM Policy  (Please replace the account ids with your own account id)
   ```
   aws iam create-policy \  
-  --policy-name 12616-KPLPolicy \  
+  --policy-name 012417-EncryptionPolicy \  
   --policy-document '  
   {  
       "Version": "2012-10-17",  
-      "Statement": [{  
+      "Statement": 
+      [
+      {  
           "Effect": "Allow",  
-          "Action": ["kinesis:PutRecord","kinesis:PutRecords","kinesis:DescribeStream"],  
+          "Action": ["kinesis:PutRecord","kinesis:PutRecords","kinesis:DescribeStream","kinesis:Get*"],  
           "Resource": ["arn:aws:kinesis:us-east-1:111122223333:stream/12616-Stream"]  
       },
       {  
@@ -77,56 +62,41 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
           "Effect": "Allow",  
           "Action": ["cloudwatch:PutMetricData"],  
           "Resource": ["*"]  
-      }
-      ]  
-  }'  
-
-  aws iam create-policy \  
-  --policy-name 12616-KCLPolicy \  
-  --policy-document '  
-  {  
-      "Version": "2012-10-17",  
-      "Statement": [{  
-          "Effect": "Allow",  
-          "Action": ["kinesis:Get*"],  
-          "Resource": ["arn:aws:kinesis:us-east-1:111122223333:stream/12616-Stream"]  
-      }, 
-      {
+      },
+       {
             "Effect": "Allow",
             "Action": [
                 "s3:*"
             ],
             "Resource": ["arn:aws:s3:::12616S3Bucket-","arn:aws:s3:::<BUCKET_NAME>/*"]
-        },
+      },
       {  
-          "Effect": "Allow",  
-          "Action": ["kinesis:DescribeStream"],  
-          "Resource": ["arn:aws:kinesis:us-east-1:111122223333:stream/12616-Stream"]  
-      }, {  
           "Effect": "Allow",  
           "Action": ["kinesis:ListStreams"],  
           "Resource": ["*"]  
-      }, {  
+      }, 
+      {  
           "Effect": "Allow",  
-          "Action": ["dynamodb:CreateTable", "dynamodb:DescribeTable", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:GetItem"],  
+          "Action": ["dynamodb:CreateTable", "dynamodb:DescribeTable", "dynamodb:Scan", "dynamodb:PutItem",        "dynamodb:UpdateItem", "dynamodb:GetItem"],  
           "Resource": ["arn:aws:dynamodb:us-east-1:111122223333:table/Centos*"]  
-      }, {  
-          "Sid": "Stmt1482832527000",  
-          "Effect": "Allow",  
-          "Action": ["cloudwatch:PutMetricData"],  
-          "Resource": ["*"]  
-      }]  
+      },
+      {
+    "Effect": "Allow",
+    "Action": ["kms:Encrypt","kms:Decrypt"],
+    "Resource": [
+      "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+      "arn:aws:kms:us-west-2:111122223333:key/0987dcba-09fe-87dc-65ba-ab0987654321"
+    ]
+  }
+  ]  
   }'  
+ 
   ```
 5. Attach the Policies to the Roles  
   ```
   aws iam attach-role-policy \  
-  --policy-arn "arn:aws:iam::111122223333:policy/12616-KPLPolicy" \  
-  --role-name 12616-KPLRole  
-
-  aws iam attach-role-policy \  
-  --policy-arn "arn:aws:iam::111122223333:policy/12616-KCLPolicy" \  
-  --role-name 12616-KCLRole  
+  --policy-arn "arn:aws:iam::111122223333:policy/012417-EncryptionPolicy" 
+  --role-name 012417-EncryptionRole  
   ```
 6. Create a Bootstrap script to automate the installation of the dependencies on newly launched instances  
   ```
@@ -135,16 +105,13 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
   sudo yum install -y java-1.8.0-* git gcc-c++ make  
   sudo yum remove -y java-1.7.0-*  
   curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -  
-  sudo yum install -y nodejs 
-  sudo yum install mysql -y
-  sudo pip install faker  
   cd /home/ec2-user   
   wget http://mirrors.whoishostingthis.com/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip  
   unzip apache-maven-3.3.9-bin.zip  
   echo "export PATH=\$PATH:/home/ec2-user/apache-maven-3.3.9/bin" >> .bashrc  
-  git clone https://github.com/cheefoo/centos.git  
-  mkdir ./centos/logs  
-  chown -R ec2-user ./centos  
+  git clone https://github.com/cheefoo/kinesisencryption.git  
+  mkdir ./kinesisencryption/logs  
+  chown -R ec2-user ./kinesisencryption  
   EOF  
 
   ```
@@ -155,39 +122,13 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
   --key-name sshkeypair \  
   --security-groups default \  
   --instance-type m3.large \  
-  --iam-instance-profile Name="12616-KPLRole" \  
+  --iam-instance-profile Name="012417-EncryptionRole" \  
   --user-data file://Bootstrap.sh  
 
-  aws ec2 create-tags --resources i-000d3b6d9fexample --tags Key=Name,Value="12616-KPLInstance"  
+  aws ec2 create-tags --resources i-000d3b6d9fexample --tags Key=Name,Value="012417-EncryptionInstance"  
 
-  aws ec2 run-instances \  
-  --image-id ami-9be6f38c \  
-  --key-name sshkeypair \  
-  --security-groups default \  
-  --instance-type m3.large \  
-  --iam-instance-profile Name="12616-KCLRole" \  
-  --user-data file://Bootstrap.sh  
-
-  aws ec2 create-tags --resources i-0879e274caexample --tags Key=Name,Value="12616-KCLInstance"  
-  ```
-8. Create an RDS Instance and take note of the JDBC Endpoint, username and password  
-  ```
-  aws rds create-db-instance \  
-  --db-instance-identifier RDSInstance12616 \  
-  --db-name DB12616 \  
-  --engine mysql \  
-  --master-username groot \  
-  --master-user-password ********** \  
-  --db-instance-class db.t1.micro \  
-  --allocated-storage 8  
-
-  ```
-9. Create an Amazon S3 bucket  
-  ```
-  aws s3 mb s3://12616S3Bucket  
-
-  ```
-10. Dont forget to modify the default security group to allow ssh access. 
+    ```
+8. Dont forget to modify the default security group to allow ssh access. 
 
 ### Running the Example Application
 | Key           | Default                                        | Description                                                                     |
@@ -203,8 +144,12 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
 | sharditerator_type | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
                                            |
 
-6.Navigate to the root of your codebase
-7. Startup the consumer
- mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams
-8. Startup the producer
- mvn exec:java -Dexec.mainClass=com.tayo.KinesisEncryption.EncryptedProducerWithStreams
+6.Navigate to the root of your codebase cd kinesisencryption
+7. Startup the Streams consumer
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams > ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log" &  
+8. Startup the Streams producer
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EnryptedProducerWithStreams > ~/kinesisencryption/logs/EnryptedProducerWithStreams.log) &> ~/kinesisencryption/logs/EnryptedProducerWithStreams.log" & 
+9. Startup the KCL consumer
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kcl.EncryptedConsumerWithKCL > ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log" &  
+10. Startup the KPL producer
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kpl.EncryptedProducerWithKPL > ~/kinesisencryption/logs/EncryptedProducerWithKPL.log) &> ~/kinesisencryption/logs/EncryptedProducerWithKPL.log" &  
