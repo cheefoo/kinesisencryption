@@ -11,9 +11,10 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
 1. An Amazon Web Services [Account](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_ZA&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_e&sc_detail=aws%20account&sc_category=cloud_computing&sc_segment=77706639422&sc_matchtype=e&sc_country=ZA&s_kwcid=AL!4422!3!77706639422!e!!g!!aws%20account&ef_id=V9u@TgAABMH86aOm:20161227051709:s)
 2. AWS CLI Installed and configured
 3. After following the steps in the Getting Started section, you will have set up the following resources:
-  
     3.1.  An AWS kinesis Stream
+    
     3.2.  One IAM role, Instance Profile and Policy required for the ec2 instance
+    
     3.3.  One AWS EC2 Instance based on AmazonLinux with dependencies pre-installed
   
 4. When the KCL is initiated, a DynamoDB table is created
