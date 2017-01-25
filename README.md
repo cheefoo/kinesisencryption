@@ -147,6 +147,7 @@ aws kms create-key
 
 ```
 cd kinesisencryption
+mvn compile
 ```
 
 7.Startup the Streams consumer
