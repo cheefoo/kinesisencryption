@@ -71,13 +71,6 @@ aws kms create-key
           "Action": ["cloudwatch:PutMetricData"],  
           "Resource": ["*"]  
       },
-       {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": ["arn:aws:s3:::12616S3Bucket-","arn:aws:s3:::<BUCKET_NAME>/*"]
-      },
       {  
           "Effect": "Allow",  
           "Action": ["kinesis:ListStreams"],  
