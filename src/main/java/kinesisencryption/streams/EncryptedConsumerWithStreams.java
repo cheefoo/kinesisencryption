@@ -1,8 +1,12 @@
 package kinesisencryption.streams;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import com.amazonaws.encryptionsdk.AwsCrypto;
+import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
@@ -29,6 +33,14 @@ public class EncryptedConsumerWithStreams
     			.getCredentials());
 		kinesis.setEndpoint(KinesisEncryptionUtils.getProperties().getProperty("kinesis_endpoint"));
 		kms.setEndpoint(KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint"));
+		String keyArn = KinesisEncryptionUtils.getProperties().getProperty("key_arn"); ;
+		String encryptionContext = KinesisEncryptionUtils.getProperties().getProperty("encryption_context");
+		log.info("Successfully retrieved keyarn property " + keyArn);
+		log.info("Successfully retrieved encryption context property " + encryptionContext);
+
+		final Map<String, String> context = Collections.singletonMap("Kinesis", encryptionContext);
+
+
 
 		try
 		{
@@ -48,7 +60,8 @@ public class EncryptedConsumerWithStreams
 				getShardIteratorRequest.setShardIteratorType(KinesisEncryptionUtils.getProperties().getProperty("sharditerator_type"));
 				GetShardIteratorResult getShardIteratorResult = kinesis.getShardIterator(getShardIteratorRequest);
 				shardIterator = getShardIteratorResult.getShardIterator();			
-				DecryptShardConsumerThread consumer = new DecryptShardConsumerThread(shardIterator, shard.getShardId(), kinesis, kms);
+				//DecryptShardConsumerThread consumer = new DecryptShardConsumerThread(shardIterator, shard.getShardId(), kinesis, kms);
+				DecryptShardConsumerThread consumer = new DecryptShardConsumerThread(shardIterator, shard.getShardId(), kinesis, context, keyArn);
 				Thread consumerThread = new Thread(consumer); 
 				log.info("Starting thread to consumer for Shard :" + shard.getShardId()  + "with ShardIterator :" + shardIterator);
 				consumerThread.start();

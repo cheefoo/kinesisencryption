@@ -9,10 +9,10 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
+import com.amazonaws.encryptionsdk.AwsCrypto;
+import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
@@ -51,6 +51,10 @@ public class EnryptedProducerWithStreams
     			.getCredentials());
 		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
 				.getCredentials());
+		String keyArn = null;
+		String encryptionContext = null;
+		final AwsCrypto crypto = new AwsCrypto();
+
 		
        /*
         * Simulating the appearance of a steady flow of data by continuously loading data from file*/
@@ -59,6 +63,10 @@ public class EnryptedProducerWithStreams
         	List<BootCarObject> cars = getDataObjects();
         	EnryptedProducerWithStreams producer = new EnryptedProducerWithStreams();
         	producer.setCarObjectList(cars);
+			keyArn = KinesisEncryptionUtils.getProperties().getProperty("key_arn");
+			log.info("Successfully retrieved keyarn property " + keyArn);
+			encryptionContext = KinesisEncryptionUtils.getProperties().getProperty("encryption_context");
+			log.info("Successfully retrieved encryption context property " + encryptionContext);
         	String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
 			log.info("Successfully retrieved stream name property " + streamName);
         	String keyId = KinesisEncryptionUtils.getProperties().getProperty("key_id");
@@ -70,6 +78,8 @@ public class EnryptedProducerWithStreams
 			log.info("Successfully retrieved kms endpoint property " + kmsEndpoint);
 			kms.setEndpoint(kmsEndpoint);
 
+			final Map<String, String> context = Collections.singletonMap("Kinesis", encryptionContext);
+			final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
 			PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
             
             List<PutRecordsRequestEntry> ptreList = new ArrayList<PutRecordsRequestEntry>();
@@ -91,7 +101,8 @@ public class EnryptedProducerWithStreams
                  	}
                  	PutRecordsRequestEntry ptre = new PutRecordsRequestEntry();
                  	//ptre.setData(car.toByteStream());
-					ByteBuffer data  = KinesisEncryptionUtils.toByteStream(kms,car, keyId);
+					//ByteBuffer data  = KinesisEncryptionUtils.toByteStream(kms,car, keyId);  // this uses KMS CMK and is limited to 4Kb
+					ByteBuffer data = KinesisEncryptionUtils.toByteStream(crypto, car, prov,context);
                  	ptre.setData(data);
                  	ptre.setPartitionKey(randomPartitionKey());
                  	ptreList.add(ptre);

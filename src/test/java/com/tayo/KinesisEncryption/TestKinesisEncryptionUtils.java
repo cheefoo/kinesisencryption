@@ -8,6 +8,8 @@ import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.amazonaws.encryptionsdk.AwsCrypto;
+import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 
@@ -44,6 +46,8 @@ public class TestKinesisEncryptionUtils extends TestCase
 	private static final String STREAM_NAME = "UnitTestStream";
 	AWSKMSClient kms;
 	private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+	final static String keyArn = "arn:aws:kms:us-east-1:573906581002:key/37dc90dc-3f1c-4a77-a51d-a653b173fcdb";
+	final AwsCrypto crypto = new AwsCrypto();
 	
 	public void setUp() throws Exception
 	{
@@ -55,6 +59,7 @@ public class TestKinesisEncryptionUtils extends TestCase
 		TestKinesisEncryptionUtils.createStream(kinesis);
 		kms = new AWSKMSClient(new ProfileCredentialsProvider()
     			.getCredentials()).withRegion(Regions.US_EAST_1);
+		final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
 		
 		
 	}
@@ -67,6 +72,8 @@ public class TestKinesisEncryptionUtils extends TestCase
 		super.tearDown();
 			
 	}
+
+
 	
 
 	public void testToByteStream() throws UnsupportedEncodingException
