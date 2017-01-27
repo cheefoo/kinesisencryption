@@ -129,7 +129,8 @@ aws kms create-key
     ```
 8. Dont forget to modify the default security group to allow ssh access. 
 
-### Running the Example Application
+### Running the Example Application 
+1. SSH into the created Instance and modify the app.properties file located in src/main/resources according to created resources below 
 | Key           | Default                                        | Description                                                                     |
 | :------------ | :--------------------------------------------- | :------------------------------------------------------------------------------ |
 | file_path     | /Users/xxxxxx/workspace/kinesisencryption/car_odom1.txt | path to the file containing the records                                                             |
@@ -142,22 +143,23 @@ aws kms create-key
                                            |
 | sharditerator_type | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
                                            |
+2. Modify the default_config.properties and replace the region property with the region in which your stream is located
 
-6.Navigate to the root of your codebase 
+3.Navigate to the root of your codebase 
 
 ```
 cd kinesisencryption
 mvn compile
 ```
 
-7.Startup the Streams consumer
+4.Startup the Streams consumer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams > ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log" &  
  
-8.Startup the Streams producer
+5.Startup the Streams producer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EnryptedProducerWithStreams > ~/kinesisencryption/logs/EnryptedProducerWithStreams.log) &> ~/kinesisencryption/logs/EnryptedProducerWithStreams.log" & 
  
-9.Startup the KCL consumer
+6.Startup the KCL consumer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kcl.EncryptedConsumerWithKCL > ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log" &  
  
-10.Startup the KPL producer
+7.Startup the KPL producer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kpl.EncryptedProducerWithKPL > ~/kinesisencryption/logs/EncryptedProducerWithKPL.log) &> ~/kinesisencryption/logs/EncryptedProducerWithKPL.log" &  
