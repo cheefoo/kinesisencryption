@@ -1,8 +1,6 @@
 package kinesisencryption.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -41,7 +39,7 @@ public class KinesisEncryptionUtils
     }
 
 
-    public static ByteBuffer toByteStream(AWSKMSClient kms, BootCarObject car, String keyId) throws UnsupportedEncodingException
+    public static ByteBuffer toEncryptedByteStream(AWSKMSClient kms, BootCarObject car, String keyId) throws UnsupportedEncodingException
     {
 
         EncryptRequest request = new EncryptRequest()
@@ -53,7 +51,7 @@ public class KinesisEncryptionUtils
         return result.getCiphertextBlob();
     }
 
-    public static ByteBuffer toByteStream(AwsCrypto crypto, Object car, final KmsMasterKeyProvider prov, final Map<String, String> context) throws UnsupportedEncodingException
+    public static ByteBuffer toEncryptedByteStream(AwsCrypto crypto, Object car, final KmsMasterKeyProvider prov, final Map<String, String> context) throws UnsupportedEncodingException
     {
         final String ciphertext = crypto.encryptString(prov, car.toString(), context).getResult();
 
@@ -82,6 +80,19 @@ public class KinesisEncryptionUtils
         }
 
         return decryptedResult.getResult();
+
+    }
+
+    public static int calculateSizeOfObject(Object obj) throws IOException
+    {
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteOutputStream);
+
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+
+        return byteOutputStream.toByteArray().length;
 
     }
 

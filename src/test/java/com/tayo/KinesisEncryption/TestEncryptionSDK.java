@@ -12,11 +12,15 @@ import junit.framework.TestCase;
 import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
@@ -60,11 +64,16 @@ public class TestEncryptionSDK extends TestCase
         final Map<String, String> context = Collections.singletonMap("Kinesis", "cars");
         try
         {
-            ByteBuffer buffer  = KinesisEncryptionUtils.toByteStream(crypto, car, prov, context);
+            ByteBuffer buffer  = KinesisEncryptionUtils.toEncryptedByteStream(crypto, car, prov, context);
             System.out.println(buffer.toString());
             Assert.assertNotNull(buffer);
             String result = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov, keyArn, context);
             Assert.assertEquals(car.toString(), result);
+            int sizeOfCar = KinesisEncryptionUtils.calculateSizeOfObject(car.toString());
+            int sizeOfEncryptedCar = KinesisEncryptionUtils.calculateSizeOfObject(result);
+            System.out.println("Size of Car is : " +sizeOfCar);
+            System.out.println("Size of Encrypted Car is : " +sizeOfEncryptedCar);
+            //Assert.assertTrue("Correct", sizeOfCar < sizeOfEncryptedCar);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -72,8 +81,53 @@ public class TestEncryptionSDK extends TestCase
         } catch (CharacterCodingException e)
         {
             e.printStackTrace();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
+
+    public void testToBytStreamForLargeRecord()
+    {
+        final Map<String, String> context = Collections.singletonMap("Kinesis", "cars");
+        Charset encoding = StandardCharsets.UTF_8.defaultCharset();
+
+        try
+        {
+            String record = readFile(filePath, encoding);
+            ByteBuffer buffer  = KinesisEncryptionUtils.toEncryptedByteStream(crypto, record, prov, context);
+            System.out.println(buffer.toString());
+            Assert.assertNotNull(buffer);
+            String result = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov, keyArn, context);
+            Assert.assertEquals(record, result);
+            int sizeOfCar = KinesisEncryptionUtils.calculateSizeOfObject(record);
+            int sizeOfEncryptedCar = KinesisEncryptionUtils.calculateSizeOfObject(result);
+            System.out.println("Size of Record is : " +sizeOfCar);
+            System.out.println("Size of Encrypted Record is : " +sizeOfEncryptedCar);
+            //Assert.assertTrue("Correct", sizeOfCar < sizeOfEncryptedCar);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        } catch (CharacterCodingException e)
+        {
+            e.printStackTrace();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private static final String filePath = "/Users/temitayo/Downloads/works.txt";
+
+    static String readFile(String path, Charset encoding) throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
 
 
 }

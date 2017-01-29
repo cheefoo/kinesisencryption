@@ -88,8 +88,8 @@ public class DecryptShardConsumerThread implements Runnable
 	public void run() 
 	{
 		final AwsCrypto crypto = new AwsCrypto();
-		final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
-		List<Record> records = new ArrayList<Record>();
+		final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(this.getKeyArn());
+		List<Record> records;
 		while (true) 
 		{		
 		  GetRecordsRequest getRecordsRequest = new GetRecordsRequest();
@@ -103,12 +103,6 @@ public class DecryptShardConsumerThread implements Runnable
 			  {    
 					 try 
 				     {
-						  /*
-						   * Now trying the KMS directly*/
-						/* DecryptRequest decrypter = new DecryptRequest().withCiphertextBlob(record.getData());
-						 DecryptResult dresult = this.getKms().decrypt(decrypter);
-						 log.info("Cipher Blob :" + record.getData().toString() + " : " + "Decrypted Text is :" 
-						 + decoder.decode(dresult.getPlaintext()).toString());*/
 						 ByteBuffer buffer = record.getData();
 						 String decryptedResult = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov,this.getKeyArn(), this.getContext());
 						 log.info("Decrypted Result is " + decryptedResult);

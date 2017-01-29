@@ -8,11 +8,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.encryptionsdk.AwsCrypto;
+import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
@@ -53,9 +52,16 @@ public class EncryptedProducerWithKPL
 		String kmsEndpoint = null;
 		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
 				.getCredentials());
+		String keyArn = null;
+		String encryptionContext = null;
+		final AwsCrypto crypto = new AwsCrypto();
 
 		try
 		{
+			keyArn = KinesisEncryptionUtils.getProperties().getProperty("key_arn");
+			log.info("Successfully retrieved keyarn property " + keyArn);
+			encryptionContext = KinesisEncryptionUtils.getProperties().getProperty("encryption_context");
+			log.info("Successfully retrieved encryption context property " + encryptionContext);
 			filePath = KinesisEncryptionUtils.getProperties().getProperty("file_path");
 			log.info("Successfully retrieved file path property " + filePath);
 			kmsEndpoint = KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint");
@@ -67,7 +73,8 @@ public class EncryptedProducerWithKPL
 			log.error("Could not load properties file " + ioe.toString());
 			throw new Exception("Could not load properties file");
 		}
-
+		final Map<String, String> context = Collections.singletonMap("Kinesis", encryptionContext);
+		final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
 		List<BootCarObject> cars = getDataObjects(filePath);
 		final FutureCallback<UserRecordResult> callback = new FutureCallback<UserRecordResult>() {
             @Override
@@ -98,7 +105,7 @@ public class EncryptedProducerWithKPL
     		{
     			
     				log.info("Before encryption record is "+ car  );
-    				ByteBuffer data = KinesisEncryptionUtils.toByteStream(kms, car, keyId);
+				    ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(crypto, car, prov,context);
     				ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
 
     				Futures.addCallback(f, callback);

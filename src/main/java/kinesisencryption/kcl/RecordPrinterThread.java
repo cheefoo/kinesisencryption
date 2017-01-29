@@ -1,17 +1,22 @@
 package kinesisencryption.kcl;
 
+import com.amazonaws.encryptionsdk.AwsCrypto;
+import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.Record;
 import com.amazonaws.services.kms.AWSKMSClient;
 import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
+import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by temitayo on 1/24/17.
@@ -20,16 +25,12 @@ public class RecordPrinterThread implements Runnable
 {
     private static final Logger log = LoggerFactory.getLogger(RecordPrinterThread.class);
     private List<Record> recordList;
-    private static final CharsetDecoder DECODER = Charset.forName("UTF-8").newDecoder();
+    //private static final CharsetDecoder DECODER = Charset.forName("UTF-8").newDecoder();
     private AmazonKinesisClient kinesis;
     private AWSKMSClient kms;
+    private Map<String, String> context ;
+    private String keyArn;
 
-    public RecordPrinterThread(List<Record> recordList, AmazonKinesisClient kinesis, AWSKMSClient kms)
-    {
-        this.recordList = recordList;
-        this.kinesis = kinesis;
-        this.kms = kms;
-    }
 
     public AmazonKinesisClient getKinesis()
     {
@@ -46,31 +47,44 @@ public class RecordPrinterThread implements Runnable
         return recordList;
     }
 
-    public void setRecordList(List<Record> recordList)
+
+    public RecordPrinterThread(List<Record> recordList, Map<String, String> context, String keyArn)
     {
         this.recordList = recordList;
+        this.context = context;
+        this.keyArn = keyArn;
+
     }
 
-    public static CharsetDecoder getDECODER()
+    public Map<String, String> getContext()
     {
-        return DECODER;
+        return context;
+    }
+
+    public String getKeyArn()
+    {
+        return keyArn;
     }
 
     @Override
     public void run()
     {
+        final AwsCrypto crypto = new AwsCrypto();
+        final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(this.getKeyArn());
         for (Record record: this.getRecordList())
         {
-            DecryptRequest decrypter = new DecryptRequest().withCiphertextBlob(record.getData());
-            DecryptResult dresult = this.getKms().decrypt(decrypter);
+
             try
             {
+                ByteBuffer buffer = record.getData();
+                String decryptedResult = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov,this.getKeyArn(), this.getContext());
+
                 log.info("Cipher Blob :" + record.getData().toString() + " : " + "Decrypted Text is :"
-                        + DECODER.decode(dresult.getPlaintext()).toString());
+                        + decryptedResult);
             }
             catch (CharacterCodingException e)
             {
-                log.error("Unable to decode result for " + dresult.getPlaintext().toString());
+                log.error("Unable to decode result for " + record.getData().toString() + "with equence number " + record.getSequenceNumber());
             }
         }
 

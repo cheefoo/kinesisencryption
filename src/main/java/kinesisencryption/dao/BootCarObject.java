@@ -1,8 +1,9 @@
 package kinesisencryption.dao;
 
 
+import java.io.Serializable;
 
-public class BootCarObject 
+public class BootCarObject implements Serializable
 {
 	private String name;
 	private String year;

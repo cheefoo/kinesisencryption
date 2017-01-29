@@ -3,10 +3,8 @@ package kinesisencryption.streams;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -20,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.PutRecordsRequest;
 import com.amazonaws.services.kinesis.model.PutRecordsRequestEntry;
@@ -100,16 +97,14 @@ public class EnryptedProducerWithStreams
                  		break;
                  	}
                  	PutRecordsRequestEntry ptre = new PutRecordsRequestEntry();
-                 	//ptre.setData(car.toByteStream());
-					//ByteBuffer data  = KinesisEncryptionUtils.toByteStream(kms,car, keyId);  // this uses KMS CMK and is limited to 4Kb
-					ByteBuffer data = KinesisEncryptionUtils.toByteStream(crypto, car, prov,context);
+					ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(crypto, car, prov,context);
                  	ptre.setData(data);
                  	ptre.setPartitionKey(randomPartitionKey());
                  	ptreList.add(ptre);
                  	log.info("Car added :" + car.toString() + "Car Cipher :" + data.toString());
                     i++;
                  }
-                 ptreList = new ArrayList<PutRecordsRequestEntry>(); 
+                 ptreList = new ArrayList();
                  cars = producer.getCarObjectList();
                  batch++;
                  Thread.sleep(100);

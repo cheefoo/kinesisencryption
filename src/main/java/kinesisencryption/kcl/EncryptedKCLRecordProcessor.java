@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by temitayo on 1/24/17.
@@ -46,21 +48,24 @@ public class EncryptedKCLRecordProcessor implements IRecordProcessor
     {
         AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
                 .getCredentials());
-        AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
-                .getCredentials());
+
+        String encryptionContext = null;
+        String keyArn = null;
         try
         {
             kinesis.setEndpoint(KinesisEncryptionUtils.getProperties().getProperty("kinesis_endpoint"));
-            kms.setEndpoint(KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint"));
+            keyArn = KinesisEncryptionUtils.getProperties().getProperty("key_arn");
+            encryptionContext = KinesisEncryptionUtils.getProperties().getProperty("encryption_context");
         } catch (IOException e)
         {
             e.printStackTrace();
         }
 
+        final Map<String, String> context = Collections.singletonMap("Kinesis", encryptionContext);
         if(list.size() > 0)
         {
             log.info("Received record size is : " + list.size());
-            RecordPrinterThread printer = new RecordPrinterThread(list, kinesis, kms);
+            RecordPrinterThread printer = new RecordPrinterThread(list,context,keyArn);
             Thread thread = new Thread(printer);
             thread.start();
 
