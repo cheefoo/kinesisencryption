@@ -134,18 +134,12 @@ aws kms create-key
 1. SSH into the created Instance and modify the app.properties file located in src/main/resources according to created resources below 
 | Key           | Default                                        | Description                                                                     |
 | :------------ | :--------------------------------------------- | :------------------------------------------------------------------------------ |
-| file_path     | /Users/xxxxxx/workspace/kinesisencryption/car_odom1.txt | path to the file containing the records                                                             |
+| file_path     | /home/ec2-user/kinesisencryption/script/kplWatch/ | path to the file containing the records                                                             |
 | key_id  | xxxxxx-3f1c-4a77-a51d-a653b173fcdb    | Id of your KMS key                                         |
-| key_arn  | arn:aws:kms:us-east-1:1111111111111:key/xxxxxx-3f1c-4a77-a51d-a653b173fcdb    | ARN of the KMS                                          |
-| stream_name | EncryptedStream    | Name of the AWS Kinesis Stream                                      |
-                                           |
-| kinesis_endpoint | Endpoint of the Kinesis Stream    | Name of the AWS Kinesis endpoint                                      |
-| kms_endpoint | EncryptedStream    | Name of the AWS KMS endpoint                                      |
-                                           |
-| sharditerator_type | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
-| kcl_name | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
-| ddb_region_4_kcl | us-east-1    | Shard Iterator type for stream consumer                                    |
-| encryption_context | cars    | Encryption context is a set of key-value pairs that you can pass to AWS KMS                                    |
+| key_arn  | arn:aws:kms:us-east-1:1111111111111:key/xxxxxx-3f1c-4a77-a51d-a653b173fcdb    | ARN of the KMS  |                                        
+| stream_name | EncryptedStream    | Name of the AWS Kinesis Stream                                      |                                  
+| kinesis_endpoint | Endpoint of the Kinesis Stream    | Name of the AWS Kinesis endpoint  |                                 
+
                                          
 2. Modify the default_config.properties and replace the region property with the region in which your stream is located
 
