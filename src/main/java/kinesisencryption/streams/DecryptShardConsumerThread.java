@@ -30,14 +30,6 @@ public class DecryptShardConsumerThread implements Runnable
 	private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	private static final Logger log = LoggerFactory.getLogger(DecryptShardConsumerThread.class);
 
-	public DecryptShardConsumerThread(String shardIterator, String shardId, AmazonKinesisClient kinesis, AWSKMSClient kms )
-	{
-		this.shardIterator = shardIterator;
-		this.shardId = shardId;
-		this.kms= kms;
-		this.kinesis = kinesis;
-
-	}
 
 	public DecryptShardConsumerThread(String shardIterator, String shardId, AmazonKinesisClient kinesis, Map<String, String> context, String keyArn)
 	{
@@ -100,7 +92,7 @@ public class DecryptShardConsumerThread implements Runnable
 				     {
 						 ByteBuffer buffer = record.getData();
 						 String decryptedResult = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov,this.getKeyArn(), this.getContext());
-						 log.info("Decrypted Result is " + decryptedResult);
+						 log.info("Decrypted Text Result is " + decryptedResult);
 					 } 
 					 catch (CharacterCodingException e) 
 					 {

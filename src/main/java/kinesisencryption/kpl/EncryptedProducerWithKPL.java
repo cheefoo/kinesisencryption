@@ -1,11 +1,7 @@
 package kinesisencryption.kpl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -13,7 +9,6 @@ import java.util.*;
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kms.AWSKMSClient;
-import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.dao.TickerSalesObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
@@ -36,9 +31,19 @@ public class EncryptedProducerWithKPL
 {
 	private static final Logger log = LoggerFactory.getLogger(EncryptedProducerWithKPL.class);
 	private static final String DELIM = ",";
+	private List<TickerSalesObject> tickerSymbolList;
 
-	
-	public static KinesisProducer getKinesisProducer() 
+	public List<TickerSalesObject> getTickerSymbolList()
+	{
+		return tickerSymbolList;
+	}
+
+	public void setTickerSymbolList(List<TickerSalesObject> tickerSymbolList)
+	{
+		this.tickerSymbolList = tickerSymbolList;
+	}
+
+	public static KinesisProducer getKinesisProducer()
 	{
 		KinesisProducerConfiguration config = KinesisProducerConfiguration.fromPropertiesFile("default_config.properties");
 		config.setCredentialsProvider(new DefaultAWSCredentialsProviderChain());
@@ -79,6 +84,9 @@ public class EncryptedProducerWithKPL
 
 
 		List<TickerSalesObject> tickerObjectList = KinesisEncryptionUtils.getDataObjects(filePath);
+		EncryptedProducerWithKPL encryptedProducerWithKPLProducer = new EncryptedProducerWithKPL();
+		encryptedProducerWithKPLProducer.setTickerSymbolList(tickerObjectList);
+
 		final FutureCallback<UserRecordResult> callback = new FutureCallback<UserRecordResult>() {
             @Override
             public void onFailure(Throwable t) {
@@ -103,24 +111,28 @@ public class EncryptedProducerWithKPL
         try
         {
         	String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
+			while(true)
+			{
+				for(TickerSalesObject ticker: tickerObjectList)
+				{
 
-        	for(TickerSalesObject ticker: tickerObjectList)
-    		{
-    			
-                log.info("Before encryption record is : "+ ticker  + "and size is : "
-                        + KinesisEncryptionUtils.calculateSizeOfObject(ticker.toString()));
-                String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, ticker, prov,context);
+					log.info("Before encryption record is : "+ ticker  + "and size is : "
+							+ KinesisEncryptionUtils.calculateSizeOfObject(ticker.toString()));
+					String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, ticker, prov,context);
 
-				log.info("Size of encrypted object is : "+ KinesisEncryptionUtils.calculateSizeOfObject(encryptedString));
-                if(KinesisEncryptionUtils.calculateSizeOfObject(encryptedString) >1024000)
-                    log.warn("Record added is greater than 1MB and may be throttled");
-                ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
-                ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
+					log.info("Size of encrypted object is : "+ KinesisEncryptionUtils.calculateSizeOfObject(encryptedString));
+					if(KinesisEncryptionUtils.calculateSizeOfObject(encryptedString) >1024000)
+						log.warn("Record added is greater than 1MB and may be throttled");
+					ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
+					ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
 
-                Futures.addCallback(f, callback);
-                log.info("Encrypted record " + data.toString() + " " + "added successfully" );
-    			
-    		}
+					Futures.addCallback(f, callback);
+					log.info("Encrypted record " + data.toString() + " " + "added successfully" );
+
+				}
+				tickerObjectList = encryptedProducerWithKPLProducer.getTickerSymbolList();
+			}
+
         }
 		catch(Exception e)
 		{

@@ -1,18 +1,14 @@
 package kinesisencryption.streams;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
-
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
+import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kms.AWSKMSClient;
-import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.dao.TickerSalesObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
@@ -20,17 +16,12 @@ import org.slf4j.LoggerFactory;
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
-import com.amazonaws.services.kinesis.model.PutRecordsRequest;
-import com.amazonaws.services.kinesis.model.PutRecordsRequestEntry;
-import com.amazonaws.services.kinesis.model.PutRecordsResult;
 
 
-public class EnryptedProducerWithStreams
+public class EncryptedProducerWithStreams
 {
 
-    private static final String DELIM = ",";
-
-    private static final Logger log = LoggerFactory.getLogger(EnryptedProducerWithStreams.class);
+    private static final Logger log = LoggerFactory.getLogger(EncryptedProducerWithStreams.class);
     private List<TickerSalesObject> tickerSymbolList;
 
     public List<TickerSalesObject> getTickerSymbolList()
@@ -77,31 +68,19 @@ public class EnryptedProducerWithStreams
             log.info("Successfully retrieved file location  property " + fileLocation);
 
             List<TickerSalesObject> tickerSymbolsList = KinesisEncryptionUtils.getDataObjects(fileLocation);
-            EnryptedProducerWithStreams producer = new EnryptedProducerWithStreams();
+            EncryptedProducerWithStreams producer = new EncryptedProducerWithStreams();
             producer.setTickerSymbolList(tickerSymbolsList);
 
             final Map<String, String> context = Collections.singletonMap("Kinesis", encryptionContext);
             final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
-            PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
 
-            List<PutRecordsRequestEntry> ptreList = new ArrayList<PutRecordsRequestEntry>();
-            int batch = 1;
             while (true)
             {
-                int i = 1;
+
                 for (TickerSalesObject ticker : tickerSymbolsList)
                 {
-                    if (i == 500)//Put Record batch requests are 500
-                    {
-                        putRecordsRequest.setRecords(ptreList);
-                        putRecordsRequest.setStreamName(streamName);
-                        PutRecordsResult putRecordsResult =
-                                kinesis.putRecords(putRecordsRequest);
-                        log.info("PutRecordsResult  : " + putRecordsResult.toString()
-                                + " has Batch Number : " + batch);
-                        break;
-                    }
-                    PutRecordsRequestEntry ptre = new PutRecordsRequestEntry();
+                    PutRecordRequest putRecordRequest = new PutRecordRequest();
+                    putRecordRequest.setStreamName(streamName);
                     log.info("Before encryption size of String Object is "
                             + KinesisEncryptionUtils.calculateSizeOfObject(ticker.toString()));
                     String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, ticker, prov, context);
@@ -109,16 +88,14 @@ public class EnryptedProducerWithStreams
                     if (KinesisEncryptionUtils.calculateSizeOfObject(encryptedString) > 1024000)
                         log.warn("Record added is greater than 1MB and may be throttled");
                     ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
-                    ptre.setData(data);
-                    ptre.setPartitionKey(randomPartitionKey());
-                    ptreList.add(ptre);
+                    putRecordRequest.setData(data);
+                    putRecordRequest.setPartitionKey(randomPartitionKey());
+                    kinesis.putRecord(putRecordRequest);
                     log.info("Ticker added :" + ticker.toString() + "Ticker Cipher :" + data.toString() + "and size : "
                             + KinesisEncryptionUtils.calculateSizeOfObject(data.toString()));
-                    i++;
+
                 }
-                ptreList = new ArrayList();
                 tickerSymbolsList = producer.getTickerSymbolList();
-                batch++;
                 Thread.sleep(100);
             }
         } catch (IOException ioe)

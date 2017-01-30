@@ -30,9 +30,11 @@ public class EncryptedConsumerWithKCL
     {
         java.security.Security.setProperty("networkaddress.cache.ttl", "60");
         credentialsProvider = new DefaultAWSCredentialsProviderChain();
+
         try
         {
             credentialsProvider.getCredentials();
+
         }
         catch(Exception e)
         {

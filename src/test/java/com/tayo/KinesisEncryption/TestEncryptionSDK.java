@@ -30,11 +30,9 @@ public class TestEncryptionSDK extends TestCase
 {
     BootCarObject car;
     String keyId;
-    AmazonKinesisClient kinesis;
-    private static final String STREAM_NAME = "UnitTestStream";
+
     AWSKMSClient kms;
-    private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-    final static String keyArn = "arn:aws:kms:us-east-1:xxxxxxx:key/mykey-3f1c-4a77-a51d-isinaws";
+    final static String keyArn = "arn:aws:kms:us-east-1:573906581002:key/37dc90dc-3f1c-4a77-a51d-a653b173fcdb";
     final AwsCrypto crypto = new AwsCrypto();
     final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
 
@@ -42,9 +40,8 @@ public class TestEncryptionSDK extends TestCase
     {
         super.setUp();
         car = new BootCarObject("Volvo 740 GL", "2012","134000");
-        keyId="mykey-3f1c-4a77-a51d-isinaws";
-        kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
-                .getCredentials()).withRegion(Regions.US_EAST_1);
+        keyId="37dc90dc-3f1c-4a77-a51d-a653b173fcdb";
+
         kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
                 .getCredentials()).withRegion(Regions.US_EAST_1);
 
