@@ -23,10 +23,13 @@ A file containing stock sales data is read by the producer(s) at startup and is 
   
 #To run the example application.
 1. Create a Kinesis stream 
+
 ```
 aws kinesis create-stream --stream-name 012417-Stream --shard-count 2 
 ```
+
 2. Create a KMS Key 
+
 ```
 aws kms create-key 
 ```
@@ -52,6 +55,7 @@ aws kms create-key
 
   aws iam add-role-to-instance-profile --instance-profile-name 012417-EncryptionRole  --role-name 012417-EncryptionRole 
    ```
+
 4. Create the Kinesis IAM Policy  (Please replace the account ids with your own account id)
   ```
   aws iam create-policy \  
