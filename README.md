@@ -136,6 +136,7 @@ aws kms create-key
 | :------------ | :--------------------------------------------- | :------------------------------------------------------------------------------ |
 | file_path     | /Users/xxxxxx/workspace/kinesisencryption/car_odom1.txt | path to the file containing the records                                                             |
 | key_id  | xxxxxx-3f1c-4a77-a51d-a653b173fcdb    | Id of your KMS key                                         |
+| key_arn  | arn:aws:kms:us-east-1:1111111111111:key/xxxxxx-3f1c-4a77-a51d-a653b173fcdb    | ARN of the KMS                                          |
 | stream_name | EncryptedStream    | Name of the AWS Kinesis Stream                                      |
                                            |
 | kinesis_endpoint | Endpoint of the Kinesis Stream    | Name of the AWS Kinesis endpoint                                      |
@@ -143,6 +144,9 @@ aws kms create-key
 | kms_endpoint | EncryptedStream    | Name of the AWS KMS endpoint                                      |
                                            |
 | sharditerator_type | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
+| kcl_name | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
+| ddb_region_4_kcl | us-east-1    | Shard Iterator type for stream consumer                                    |
+| encryption_context | cars    | Encryption context is a set of key-value pairs that you can pass to AWS KMS                                    |
                                            |
 2. Modify the default_config.properties and replace the region property with the region in which your stream is located
 
@@ -157,7 +161,7 @@ mvn compile
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams > ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log" &  
  
 5.Startup the Streams producer
- nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedProducerWithStreams > ~/kinesisencryption/logs/EnryptedProducerWithStreams.log) &> ~/kinesisencryption/logs/EnryptedProducerWithStreams.log" &
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedProducerWithStreams > ~/kinesisencryption/logs/EncryptedProducerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedProducerWithStreams.log" &
  
 6.Startup the KCL consumer
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kcl.EncryptedConsumerWithKCL > ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log" &  
