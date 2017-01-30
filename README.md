@@ -143,8 +143,8 @@ aws kms create-key
 | kinesis_endpoint | Endpoint of the Kinesis Stream    | Name of the AWS Kinesis endpoint  |   
 | kms_endpoint | EncryptedStream    | Name of the AWS KMS endpoint                                      |
 | sharditerator_type | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
-| kcl_name | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
-| ddb_region_4_kcl | us-east-1    | Shard Iterator type for stream consumer                                    |
+| kcl_name | TRIM_HORIZON    | Name of the KCL app                                     |
+| ddb_region_4_kcl | us-east-1    | AWS region in which dynamodb table is created for the KCL                                  |
 | encryption_context | cars    | Encryption context is a set of key-value pairs that you can pass to AWS KMS  |                                  
 
                                          
