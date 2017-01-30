@@ -140,14 +140,13 @@ aws kms create-key
 | stream_name | EncryptedStream    | Name of the AWS Kinesis Stream                                      |
                                            |
 | kinesis_endpoint | Endpoint of the Kinesis Stream    | Name of the AWS Kinesis endpoint                                      |
-                                           |
 | kms_endpoint | EncryptedStream    | Name of the AWS KMS endpoint                                      |
                                            |
 | sharditerator_type | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
 | kcl_name | TRIM_HORIZON    | Shard Iterator type for stream consumer                                    |
 | ddb_region_4_kcl | us-east-1    | Shard Iterator type for stream consumer                                    |
 | encryption_context | cars    | Encryption context is a set of key-value pairs that you can pass to AWS KMS                                    |
-                                           |
+                                         
 2. Modify the default_config.properties and replace the region property with the region in which your stream is located
 
 3.Navigate to the root of your codebase 
