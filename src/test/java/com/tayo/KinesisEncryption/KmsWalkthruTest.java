@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kms.AWSKMSClient;
 import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
@@ -35,7 +34,7 @@ public class KmsWalkthruTest
 		}
 		
 		EncryptRequest request = new EncryptRequest()
-				.withKeyId("37dc90dc-3f1c-4a77-a51d-a653b173fcdb")
+				.withKeyId("mykey-3f1c-4a77-a51d-isinaws")
 				.withPlaintext(ByteBuffer.wrap(String.format("temitayo").getBytes("UTF-8")));
 		
 		

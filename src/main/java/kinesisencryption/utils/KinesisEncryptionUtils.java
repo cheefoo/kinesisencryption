@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.amazonaws.encryptionsdk.AwsCrypto;
@@ -55,10 +57,10 @@ public class KinesisEncryptionUtils
         return result.getCiphertextBlob();
     }
 
-    public static String toEncryptedString(AwsCrypto crypto, Object car, final KmsMasterKeyProvider prov,
+    public static String toEncryptedString(AwsCrypto crypto, Object object, final KmsMasterKeyProvider prov,
                                                    final Map<String, String> context) throws IOException
     {
-        final String ciphertext = crypto.encryptString(prov, car.toString(), context).getResult();
+        final String ciphertext = crypto.encryptString(prov, object.toString(), context).getResult();
 
         return ciphertext;
     }
@@ -160,6 +162,12 @@ public class KinesisEncryptionUtils
         log.info("Finished reading all objects from file");
 
         return userObjectList;
+    }
+
+    public static String readFile(String path, Charset encoding) throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 
 }
