@@ -42,7 +42,7 @@ public class TestEncryptionSDK extends TestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        car = new BootCarObject("Volvo 740 GL", "134000", "2012");
+        car = new BootCarObject("Volvo 740 GL", "2012","134000");
         keyId="37dc90dc-3f1c-4a77-a51d-a653b173fcdb";
         kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
                 .getCredentials()).withRegion(Regions.US_EAST_1);
@@ -64,16 +64,21 @@ public class TestEncryptionSDK extends TestCase
         final Map<String, String> context = Collections.singletonMap("Kinesis", "cars");
         try
         {
-            ByteBuffer buffer  = KinesisEncryptionUtils.toEncryptedByteStream(crypto, car, prov, context);
+            String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, car.toString(), prov, context);
+            ByteBuffer buffer  = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
             System.out.println(buffer.toString());
+
             Assert.assertNotNull(buffer);
-            String result = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov, keyArn, context);
-            Assert.assertEquals(car.toString(), result);
+
             int sizeOfCar = KinesisEncryptionUtils.calculateSizeOfObject(car.toString());
-            int sizeOfEncryptedCar = KinesisEncryptionUtils.calculateSizeOfObject(result);
+            int sizeOfEncryptedCar = KinesisEncryptionUtils.calculateSizeOfObject(encryptedString);
             System.out.println("Size of Car is : " +sizeOfCar);
             System.out.println("Size of Encrypted Car is : " +sizeOfEncryptedCar);
-            //Assert.assertTrue("Correct", sizeOfCar < sizeOfEncryptedCar);
+
+            Assert.assertTrue("Correct", sizeOfCar < sizeOfEncryptedCar);
+
+            String result = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov, keyArn, context);
+            Assert.assertEquals(car.toString(), result);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -95,16 +100,20 @@ public class TestEncryptionSDK extends TestCase
         try
         {
             String record = readFile(filePath, encoding);
-            ByteBuffer buffer  = KinesisEncryptionUtils.toEncryptedByteStream(crypto, record, prov, context);
-            System.out.println(buffer.toString());
+            String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, record, prov, context);
+            ByteBuffer buffer  = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
+
             Assert.assertNotNull(buffer);
-            String result = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov, keyArn, context);
-            Assert.assertEquals(record, result);
+
             int sizeOfCar = KinesisEncryptionUtils.calculateSizeOfObject(record);
-            int sizeOfEncryptedCar = KinesisEncryptionUtils.calculateSizeOfObject(result);
+            int sizeOfEncryptedCar = KinesisEncryptionUtils.calculateSizeOfObject(encryptedString);
             System.out.println("Size of Record is : " +sizeOfCar);
             System.out.println("Size of Encrypted Record is : " +sizeOfEncryptedCar);
-            //Assert.assertTrue("Correct", sizeOfCar < sizeOfEncryptedCar);
+
+            Assert.assertTrue("Correct", sizeOfCar < sizeOfEncryptedCar);
+
+            String result = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov, keyArn, context);
+            Assert.assertEquals(record, result);
         }
         catch (UnsupportedEncodingException e)
         {
@@ -120,7 +129,7 @@ public class TestEncryptionSDK extends TestCase
 
     }
 
-    private static final String filePath = "/Users/temitayo/Downloads/works.txt";
+    private static final String filePath = "/Users/temitayo/Downloads/jeopardy-questions.json";
 
     static String readFile(String path, Charset encoding) throws IOException
     {

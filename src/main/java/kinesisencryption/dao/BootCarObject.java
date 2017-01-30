@@ -19,12 +19,12 @@ public class BootCarObject implements Serializable
 		this.year = year;
 		this.odometer = odometer;
 	}
-	@Override
+	/*@Override
 	public String toString() 
 	{
 		return  name + "," + year + "," + odometer;
 	}
-	
+	*/
 
 
 

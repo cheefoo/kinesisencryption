@@ -29,11 +29,17 @@ public class TestCalculateObjectSize extends TestCase
 
     public void testCalculation()
     {
+       String real = "Volvo 740 GL, 134000, 2012";
         try
         {
-            int size = KinesisEncryptionUtils.calculateSizeOfObject(car);
-            System.out.println("car size : " + size);
-            Assert.assertTrue("Correct", size>1);
+            int sizeString = KinesisEncryptionUtils.calculateSizeOfObject(car.toString());
+
+            int sizeObject = KinesisEncryptionUtils.calculateSizeOfObject(car);
+            int sizeRealString = KinesisEncryptionUtils.calculateSizeOfObject(real);
+            System.out.println("car size String is : " + sizeString);
+            System.out.println("car size  Object : " + sizeObject);
+            System.out.println("Real size  String : " + sizeRealString);
+            Assert.assertTrue("Correct", sizeString>1);
         } catch (IOException e)
         {
             e.printStackTrace();

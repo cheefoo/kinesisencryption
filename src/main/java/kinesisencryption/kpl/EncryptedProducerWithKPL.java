@@ -14,6 +14,7 @@ import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.dao.BootCarObject;
+import kinesisencryption.dao.TickerSalesObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,9 @@ public class EncryptedProducerWithKPL
 		}
 		final Map<String, String> context = Collections.singletonMap("Kinesis", encryptionContext);
 		final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
-		List<BootCarObject> cars = getDataObjects(filePath);
+
+
+		List<TickerSalesObject> tickerObjectList = KinesisEncryptionUtils.getDataObjects(filePath);
 		final FutureCallback<UserRecordResult> callback = new FutureCallback<UserRecordResult>() {
             @Override
             public void onFailure(Throwable t) {
@@ -100,16 +103,22 @@ public class EncryptedProducerWithKPL
         try
         {
         	String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
-        	String keyId = KinesisEncryptionUtils.getProperties().getProperty("key_id");
-        	for(BootCarObject car: cars)
+
+        	for(TickerSalesObject ticker: tickerObjectList)
     		{
     			
-    				log.info("Before encryption record is "+ car  );
-				    ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(crypto, car, prov,context);
-    				ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
+                log.info("Before encryption record is : "+ ticker  + "and size is : "
+                        + KinesisEncryptionUtils.calculateSizeOfObject(ticker.toString()));
+                String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, ticker, prov,context);
 
-    				Futures.addCallback(f, callback);
-    				log.info("Encrypted record " + data.toString() + " " + "added successfully");
+				log.info("Size of encrypted object is : "+ KinesisEncryptionUtils.calculateSizeOfObject(encryptedString));
+                if(KinesisEncryptionUtils.calculateSizeOfObject(encryptedString) >1024000)
+                    log.warn("Record added is greater than 1MB and may be throttled");
+                ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
+                ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
+
+                Futures.addCallback(f, callback);
+                log.info("Encrypted record " + data.toString() + " " + "added successfully" );
     			
     		}
         }
@@ -125,33 +134,7 @@ public class EncryptedProducerWithKPL
     {
         return new BigInteger(128, new Random()).toString(10);
     }
-	public static  List<BootCarObject> getDataObjects(String filePath)
-	{
-		List<BootCarObject> carObjectList= new ArrayList<BootCarObject>();
 
-		try 
-		{
-			FileInputStream fis = new FileInputStream(new File(filePath));
-	    	BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-	    	String line = null;
-	    	while ((line = br.readLine()) != null)
-	    	{
-				String [] tokens = line.split(DELIM);
-	        	BootCarObject car = new BootCarObject(tokens[0], tokens[1], tokens[2]);
-	        	carObjectList.add(car);
-	    	}
-						
-		} 
-		catch (FileNotFoundException ex) 
-		{
-			ex.printStackTrace();
-		} 
-		catch (IOException ex) 
-		{
-			ex.printStackTrace();
-		} 
-		
-		return carObjectList;
-	}
+
 	
 }

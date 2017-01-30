@@ -5,15 +5,19 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.CryptoResult;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKey;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
+
 import kinesisencryption.dao.BootCarObject;
+import kinesisencryption.dao.TickerSalesObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +43,7 @@ public class KinesisEncryptionUtils
     }
 
 
-    public static ByteBuffer toEncryptedByteStream(AWSKMSClient kms, BootCarObject car, String keyId) throws UnsupportedEncodingException
+    public static ByteBuffer toEncryptedByteStream(AWSKMSClient kms, Object car, String keyId) throws UnsupportedEncodingException
     {
 
         EncryptRequest request = new EncryptRequest()
@@ -51,9 +55,16 @@ public class KinesisEncryptionUtils
         return result.getCiphertextBlob();
     }
 
-    public static ByteBuffer toEncryptedByteStream(AwsCrypto crypto, Object car, final KmsMasterKeyProvider prov, final Map<String, String> context) throws UnsupportedEncodingException
+    public static String toEncryptedString(AwsCrypto crypto, Object car, final KmsMasterKeyProvider prov,
+                                                   final Map<String, String> context) throws IOException
     {
         final String ciphertext = crypto.encryptString(prov, car.toString(), context).getResult();
+
+        return ciphertext;
+    }
+
+    public static ByteBuffer toEncryptedByteStream(String ciphertext) throws IOException
+    {
 
         return ByteBuffer.wrap(String.format(ciphertext.toString()).getBytes("UTF-8"));
     }
@@ -94,6 +105,61 @@ public class KinesisEncryptionUtils
 
         return byteOutputStream.toByteArray().length;
 
+    }
+
+    public static List<String> getFilesToSend(final File folder)
+    {
+        List<String> filesToSend = new ArrayList<String>();
+        for (final File fileEntry : folder.listFiles())
+        {
+            if (fileEntry.isDirectory())
+            {
+                log.info("File is a directory.... skipping");
+            }
+            else
+            {
+                filesToSend.add(fileEntry.getAbsolutePath());
+            }
+        }
+
+        return filesToSend;
+    }
+
+    public static List<TickerSalesObject> getDataObjects(String fileName) throws Exception
+    {
+        List<TickerSalesObject> userObjectList= new ArrayList<TickerSalesObject>();
+        try
+        {
+            // read the json file
+            FileReader reader = new FileReader(fileName);
+            JSONParser jsonParser = new JSONParser();
+            JSONArray jsonArray = (JSONArray)jsonParser.parse(reader);
+
+            for(Object obj : jsonArray)
+            {
+                JSONObject jsonObject = (JSONObject) obj;
+                String symbol = (String) jsonObject.get("symbol");
+                String salesPrice = (String) jsonObject.get("salesPrice");
+                String orderId = (String) jsonObject.get("orderId");
+                String activityTimestamp = (String) jsonObject.get("activityTimestamp");
+
+                TickerSalesObject user = new TickerSalesObject(symbol,salesPrice, orderId,activityTimestamp);
+                userObjectList.add(user);
+            }
+
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+        catch (ParseException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        log.info("Finished reading all objects from file");
+
+        return userObjectList;
     }
 
 }
