@@ -132,6 +132,8 @@ aws kms create-key
 
 ### Running the Example Application 
 1. SSH into the created Instance and modify the app.properties file located in src/main/resources according to created resources below 
+
+
 | Key           | Default                                        | Description                                                                     |
 | :------------ | :--------------------------------------------- | :------------------------------------------------------------------------------ |
 | file_path     | /home/ec2-user/kinesisencryption/script/kplWatch/ | path to the file containing the records                                                             |
@@ -143,7 +145,7 @@ aws kms create-key
                                          
 2. Modify the default_config.properties and replace the region property with the region in which your stream is located
 
-3.Navigate to the root of your codebase 
+3. Navigate to the root of your codebase 
 
 ```
 cd kinesisencryption
