@@ -6,7 +6,7 @@ Encrypting records with AWS KMS before sending to Kinesis Endpoint and Decryptin
 
 Demo to demonstrate the use of KMS to encrypt records before sending to a Kinesis Stream and to also decrypt records consumed from the stream. One example each of encrypting records with the KPL and the Streams API and another example of decrypting the records with Streams API and KCL
 The default AWS region used here is us-east-1 
-A file containing car data (car_odom1.txt) is read by the producer at startup and is reloaded several times to simulate streaming data.
+A file containing stock sales data is read by the producer(s) at startup and is reloaded several times to simulate streaming data.
 ###Requirements:
 1. An Amazon Web Services [Account](https://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_ZA&sc_publisher=google&sc_medium=cloud_computing_b&sc_content=aws_account_e&sc_detail=aws%20account&sc_category=cloud_computing&sc_segment=77706639422&sc_matchtype=e&sc_country=ZA&s_kwcid=AL!4422!3!77706639422!e!!g!!aws%20account&ef_id=V9u@TgAABMH86aOm:20161227051709:s)
 2. AWS CLI Installed and configured
@@ -19,6 +19,7 @@ A file containing car data (car_odom1.txt) is read by the producer at startup an
     3.3.  One AWS EC2 Instance based on AmazonLinux with dependencies pre-installed
   
 4. When the KCL is initiated, a DynamoDB table is created
+5. [Java Crystography Extension Unlimited Strength Jurisdiction Policy Files] (http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
   
 #To run the example application.
 1. Create a Kinesis stream 
