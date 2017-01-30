@@ -48,13 +48,13 @@ public class EncryptedConsumerWithKCL
         String workerId = InetAddress.getLocalHost().getCanonicalHostName() + ":" + UUID.randomUUID();
         String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
         String appName = KinesisEncryptionUtils.getProperties().getProperty("kcl_name");
-        String endpoint = KinesisEncryptionUtils.getProperties().getProperty("kinesis_endpoint");
+        String ddbRegion = KinesisEncryptionUtils.getProperties().getProperty("ddb_region_4_kcl");
         KinesisClientLibConfiguration kinesisClientLibConfiguration =
                 new KinesisClientLibConfiguration(appName,
                         streamName,
                         credentialsProvider,
                         workerId);
-        kinesisClientLibConfiguration.withInitialPositionInStream(INITIAL_POSITION_IN_STREAM).withKinesisEndpoint(endpoint);
+        kinesisClientLibConfiguration.withInitialPositionInStream(INITIAL_POSITION_IN_STREAM).withRegionName(ddbRegion);
 
         IRecordProcessorFactory recordProcessorFactory = new EncryptedKCLRecordProcessorFactory();
         Worker worker = new Worker(recordProcessorFactory, kinesisClientLibConfiguration);
