@@ -19,7 +19,7 @@ A file containing stock sales data is read by the producer(s) at startup and is 
     3.3.  One AWS EC2 Instance based on AmazonLinux with dependencies pre-installed
   
 4. When the KCL is initiated, a DynamoDB table is created
-5. [Java Crystography Extension Unlimited Strength Jurisdiction Policy Files] (http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
+5. [Java Crystography Extension Unlimited Strength Jurisdiction Policy Files] (http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html) extract the contents from the zipped file and save them to ${java.home}/jre/lib/security/.
   
 #To run the example application.
 1. Create a Kinesis stream 
