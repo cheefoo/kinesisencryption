@@ -1,6 +1,6 @@
 package kinesisencryption.kcl;
 
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.InvalidStateException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ShutdownException;
@@ -9,7 +9,6 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorCheckpointer;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
-import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class EncryptedKCLRecordProcessor implements IRecordProcessor
     @Override
     public void processRecords(List<Record> list, IRecordProcessorCheckpointer iRecordProcessorCheckpointer)
     {
-        AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
+        AmazonKinesisClient kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
                 .getCredentials());
 
         String encryptionContext = null;

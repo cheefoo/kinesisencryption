@@ -5,13 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.amazonaws.encryptionsdk.AwsCrypto;
-import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.kms.AWSKMSClient;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.DescribeStreamResult;
 import com.amazonaws.services.kinesis.model.GetShardIteratorRequest;
@@ -27,9 +25,9 @@ public class EncryptedConsumerWithStreams
 	
 	public static void main (String [] args) throws Exception
 	{
-		AmazonKinesisClient kinesis = new AmazonKinesisClient(new ProfileCredentialsProvider()
+		AmazonKinesisClient kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
     			.getCredentials());
-		AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
+		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
     			.getCredentials());
 		kinesis.setEndpoint(KinesisEncryptionUtils.getProperties().getProperty("kinesis_endpoint"));
 		kms.setEndpoint(KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint"));

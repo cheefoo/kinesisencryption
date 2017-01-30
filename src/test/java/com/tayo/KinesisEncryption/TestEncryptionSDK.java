@@ -1,7 +1,6 @@
 package com.tayo.KinesisEncryption;
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.regions.Regions;
@@ -46,7 +45,7 @@ public class TestEncryptionSDK extends TestCase
         keyId="mykey-3f1c-4a77-a51d-isinaws";
         kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
                 .getCredentials()).withRegion(Regions.US_EAST_1);
-        kms = new AWSKMSClient(new ProfileCredentialsProvider()
+        kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
                 .getCredentials()).withRegion(Regions.US_EAST_1);
 
 

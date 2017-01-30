@@ -6,8 +6,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.List;
-
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kms.AWSKMSClient;
 import com.amazonaws.services.kms.model.DecryptRequest;
@@ -22,7 +21,7 @@ public class KmsWalkthruTest
 	private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	public static void main (String [] args) throws UnsupportedEncodingException, CharacterCodingException
 	{
-		AWSKMSClient kms = new AWSKMSClient(new ProfileCredentialsProvider()
+		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
     			.getCredentials()).withRegion(Regions.US_EAST_1);
 		ListKeysResult keyResults = kms.listKeys();
 		List<KeyListEntry> keys = keyResults.getKeys();

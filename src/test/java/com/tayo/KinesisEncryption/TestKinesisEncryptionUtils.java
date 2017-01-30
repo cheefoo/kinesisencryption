@@ -21,7 +21,6 @@ import kinesisencryption.utils.KinesisEncryptionUtils;
 
 
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kms.AWSKMSClient;
@@ -53,7 +52,7 @@ public class TestKinesisEncryptionUtils extends TestCase
 		kinesis = new AmazonKinesisClient(new DefaultAWSCredentialsProviderChain()
     			.getCredentials()).withRegion(Regions.US_EAST_1);
 		TestKinesisEncryptionUtils.createStream(kinesis);
-		kms = new AWSKMSClient(new ProfileCredentialsProvider()
+		kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
     			.getCredentials()).withRegion(Regions.US_EAST_1);
 
 	}
