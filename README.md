@@ -162,13 +162,21 @@ mvn compile
 ```
 
 4.Startup the Streams consumer
- nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams > ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log" &  
+```
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedConsumerWithStreams > ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithStreams.log" & 
+ ```
  
 5.Startup the Streams producer
+```
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.streams.EncryptedProducerWithStreams > ~/kinesisencryption/logs/EncryptedProducerWithStreams.log) &> ~/kinesisencryption/logs/EncryptedProducerWithStreams.log" &
+ ```
  
 6.Startup the KCL consumer
- nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kcl.EncryptedConsumerWithKCL > ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log" &  
+```
+ nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kcl.EncryptedConsumerWithKCL > ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log) &> ~/kinesisencryption/logs/EncryptedConsumerWithKCL.log" & 
+ ```
  
 7.Startup the KPL producer
+```
  nohup bash -c "(mvn exec:java -Dexec.mainClass=kinesisencryption.kpl.EncryptedProducerWithKPL > ~/kinesisencryption/logs/EncryptedProducerWithKPL.log) &> ~/kinesisencryption/logs/EncryptedProducerWithKPL.log" &  
+ ```
