@@ -8,13 +8,10 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.CryptoResult;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKey;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
-
-import kinesisencryption.dao.BootCarObject;
 import kinesisencryption.dao.TickerSalesObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,6 +24,9 @@ import com.amazonaws.services.kms.AWSKMSClient;
 import com.amazonaws.services.kms.model.EncryptRequest;
 import com.amazonaws.services.kms.model.EncryptResult;
 
+/*
+    Utils class that provides methods for encryption and decryption of Kinesis records
+ */
 
 public class KinesisEncryptionUtils
 {
@@ -86,6 +86,8 @@ public class KinesisEncryptionUtils
 
         // The SDK may add information to the encryption context, so we check to ensure
         // that all of our values are present
+        //For more information about encryption context, see
+        // https://amzn.to/1nSbe9X (blogs.aws.amazon.com)
         for (final Map.Entry<String, String> e : context.entrySet()) {
             if (!e.getValue().equals(decryptedResult.getEncryptionContext().get(e.getKey()))) {
                 throw new IllegalStateException("Wrong Encryption Context!");
@@ -107,24 +109,6 @@ public class KinesisEncryptionUtils
 
         return byteOutputStream.toByteArray().length;
 
-    }
-
-    public static List<String> getFilesToSend(final File folder)
-    {
-        List<String> filesToSend = new ArrayList<String>();
-        for (final File fileEntry : folder.listFiles())
-        {
-            if (fileEntry.isDirectory())
-            {
-                log.info("File is a directory.... skipping");
-            }
-            else
-            {
-                filesToSend.add(fileEntry.getAbsolutePath());
-            }
-        }
-
-        return filesToSend;
     }
 
     public static List<TickerSalesObject> getDataObjects(String fileName) throws Exception

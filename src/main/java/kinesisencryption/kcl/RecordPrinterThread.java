@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by temitayo on 1/24/17.
+ * Thread used for decrypting and printing consumed records to the logs
+ *
  */
 public class RecordPrinterThread implements Runnable
 {
     private static final Logger log = LoggerFactory.getLogger(RecordPrinterThread.class);
     private List<Record> recordList;
-    //private static final CharsetDecoder DECODER = Charset.forName("UTF-8").newDecoder();
     private AmazonKinesisClient kinesis;
     private AWSKMSClient kms;
     private Map<String, String> context ;

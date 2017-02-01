@@ -94,6 +94,8 @@ public class TestKinesisEncryptionUtils extends TestCase
 		int sizeOfRecord = KinesisEncryptionUtils.calculateSizeOfObject(record);
 		String encryptedRecord = KinesisEncryptionUtils.toEncryptedString(crypto,record,prov,context);
 		int sizeOfEncryptedRecord = KinesisEncryptionUtils.calculateSizeOfObject(encryptedRecord);
+		System.out.println("Size of Record is : " + sizeOfRecord);
+		System.out.println("Size of Encrypted Record is  : " + sizeOfEncryptedRecord);
 		ByteBuffer buffer = KinesisEncryptionUtils.toEncryptedByteStream(encryptedRecord);
 		Assert.assertTrue("Correct", sizeOfRecord < sizeOfEncryptedRecord);
 		putRecordRequest.setData(buffer);
@@ -110,7 +112,7 @@ public class TestKinesisEncryptionUtils extends TestCase
 
 	}
 
-	public String decryptLargeRecord()
+	private String decryptLargeRecord()
 	{
 		List<Record> records;
 		DescribeStreamResult streamResult = kinesis.describeStream(STREAM_NAME);
@@ -167,7 +169,7 @@ public class TestKinesisEncryptionUtils extends TestCase
 		return decodedRecord;
 	}
 	
-	public void kmsDecryption()
+	private void kmsDecryption()
 	{	
 			List<Record> records = new ArrayList<Record>();
 			DescribeStreamResult streamResult = kinesis.describeStream(STREAM_NAME);

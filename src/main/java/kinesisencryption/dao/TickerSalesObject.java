@@ -1,7 +1,8 @@
 package kinesisencryption.dao;
 
 /**
- * Created by temitayo on 1/29/17.
+ * Object that is read into Kinesis record to be encrypted before it is fed to a Kinesis Stream
+ * 
  */
 public class TickerSalesObject
 {
