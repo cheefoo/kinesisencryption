@@ -91,6 +91,7 @@ public class DecryptShardConsumerThread implements Runnable
 					 try 
 				     {
 						 ByteBuffer buffer = record.getData();
+						 //Decrypting the encrypted record data
 						 String decryptedResult = KinesisEncryptionUtils.decryptByteStream(crypto,buffer,prov,this.getKeyArn(), this.getContext());
 						 log.info("Decrypted Text Result is " + decryptedResult);
 					 } 

@@ -83,13 +83,17 @@ public class EncryptedProducerWithStreams
                     putRecordRequest.setStreamName(streamName);
                     log.info("Before encryption size of String Object is "
                             + KinesisEncryptionUtils.calculateSizeOfObject(ticker.toString()));
+                    //Encrypting the records
                     String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, ticker, prov, context);
                     log.info("Size of encrypted object is : " + KinesisEncryptionUtils.calculateSizeOfObject(encryptedString));
+                    //check if size of record is greater than 1MB
                     if (KinesisEncryptionUtils.calculateSizeOfObject(encryptedString) > 1024000)
                         log.warn("Record added is greater than 1MB and may be throttled");
+                    //UTF-8 encoding of encryptyed record
                     ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
                     putRecordRequest.setData(data);
                     putRecordRequest.setPartitionKey(randomPartitionKey());
+                    //putting the record into the stream
                     kinesis.putRecord(putRecordRequest);
                     log.info("Ticker added :" + ticker.toString() + "Ticker Cipher :" + data.toString() + "and size : "
                             + KinesisEncryptionUtils.calculateSizeOfObject(data.toString()));

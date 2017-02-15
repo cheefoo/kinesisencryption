@@ -44,7 +44,7 @@ public class KinesisEncryptionUtils
         return prop;
     }
 
-
+    //Used only in test cases
     public static ByteBuffer toEncryptedByteStream(AWSKMSClient kms, Object car, String keyId) throws UnsupportedEncodingException
     {
 
@@ -71,6 +71,9 @@ public class KinesisEncryptionUtils
         return ByteBuffer.wrap(String.format(ciphertext.toString()).getBytes("UTF-8"));
     }
 
+    /*
+    Decrypting the records
+     */
     public static String decryptByteStream(AwsCrypto crypto,  ByteBuffer buffer, final KmsMasterKeyProvider prov, String keyArn, final Map<String, String> context) throws CharacterCodingException
     {
 

@@ -1,10 +1,12 @@
 package kinesisencryption.dao;
 
+import java.io.Serializable;
+
 /**
- * Object that is read into Kinesis record to be encrypted before it is fed to a Kinesis Stream
- * 
+ * Example Object that is read into Kinesis record to be encrypted before it is fed to a Kinesis Stream
+ *
  */
-public class TickerSalesObject
+public class TickerSalesObject implements Serializable
 {
     private String tickerSymbol;
     private String salesPrice;

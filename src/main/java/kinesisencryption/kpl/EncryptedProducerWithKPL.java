@@ -115,24 +115,23 @@ public class EncryptedProducerWithKPL
 			{
 				for(TickerSalesObject ticker: tickerObjectList)
 				{
-
 					log.info("Before encryption record is : "+ ticker  + "and size is : "
 							+ KinesisEncryptionUtils.calculateSizeOfObject(ticker.toString()));
+					//Encrypting the records
 					String encryptedString = KinesisEncryptionUtils.toEncryptedString(crypto, ticker, prov,context);
-
 					log.info("Size of encrypted object is : "+ KinesisEncryptionUtils.calculateSizeOfObject(encryptedString));
+					//check if size of record is greater than 1MB
 					if(KinesisEncryptionUtils.calculateSizeOfObject(encryptedString) >1024000)
 						log.warn("Record added is greater than 1MB and may be throttled");
+					//UTF-8 encoding of encrypted record
 					ByteBuffer data = KinesisEncryptionUtils.toEncryptedByteStream(encryptedString);
+					//Adding the encrypted record to stream
 					ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(), data);
-
 					Futures.addCallback(f, callback);
 					log.info("Encrypted record " + data.toString() + " " + "added successfully" );
-
 				}
 				tickerObjectList = encryptedProducerWithKPLProducer.getTickerSymbolList();
 			}
-
         }
 		catch(Exception e)
 		{
