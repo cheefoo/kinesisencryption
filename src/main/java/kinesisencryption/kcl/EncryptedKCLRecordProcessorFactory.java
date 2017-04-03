@@ -6,12 +6,8 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorF
 /**
  * Created by temitayo on 1/24/17.
  */
-public class EncryptedKCLRecordProcessorFactory implements IRecordProcessorFactory
-{
-
-    @Override
-    public IRecordProcessor createProcessor()
-    {
-        return new EncryptedKCLRecordProcessor();
-    }
+public class EncryptedKCLRecordProcessorFactory implements IRecordProcessorFactory {
+	public IRecordProcessor createProcessor() {
+		return new EncryptedKCLRecordProcessor();
+	}
 }
