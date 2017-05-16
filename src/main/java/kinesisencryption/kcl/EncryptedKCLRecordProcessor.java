@@ -19,7 +19,7 @@ import com.amazonaws.services.kinesis.model.Record;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 
 /**
- * Created by temitayo on 1/24/17.
+ * A KCL RecordProcessor that processes encrypted Kinesis records
  */
 public class EncryptedKCLRecordProcessor implements IRecordProcessor {
 	private static final Logger log = LoggerFactory.getLogger(EncryptedKCLRecordProcessor.class);
@@ -103,7 +103,7 @@ public class EncryptedKCLRecordProcessor implements IRecordProcessor {
 				log.error("Cannot save checkpoint to the DynamoDB table used by the Amazon Kinesis Client Library.", e);
 				break;
 			}
-			
+
 			try {
 				Thread.sleep(BACKOFF_TIME_IN_MILLIS);
 			} catch (InterruptedException e) {

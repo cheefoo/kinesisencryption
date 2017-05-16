@@ -15,7 +15,7 @@ import java.net.InetAddress;
 import java.util.UUID;
 
 /**
- * Created by temitayo on 1/24/17.
+ * A consumer application that consumes encrypted records from kinesis streams.
  */
 public class EncryptedConsumerWithKCL {
 	private static final InitialPositionInStream INITIAL_POSITION_IN_STREAM = InitialPositionInStream.TRIM_HORIZON;

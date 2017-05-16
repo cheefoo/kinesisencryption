@@ -2,6 +2,10 @@ package kinesisencryption.dao;
 
 
 import java.io.Serializable;
+/**
+ * Example Object that is read into Kinesis record and used in test cases
+ *
+ */
 
 public class BootCarObject implements Serializable
 {
@@ -10,9 +14,9 @@ public class BootCarObject implements Serializable
 	private String odometer;
 
 
-	
 
-	public BootCarObject(String name, String year, String odometer) 
+
+	public BootCarObject(String name, String year, String odometer)
 	{
 		super();
 		this.name = name;
@@ -20,7 +24,7 @@ public class BootCarObject implements Serializable
 		this.odometer = odometer;
 	}
 	@Override
-	public String toString() 
+	public String toString()
 	{
 		return  name + "," + year + "," + odometer;
 	}

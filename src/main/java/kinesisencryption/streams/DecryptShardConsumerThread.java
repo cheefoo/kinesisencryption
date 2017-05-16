@@ -20,6 +20,10 @@ import com.amazonaws.services.kms.AWSKMSClient;
 
 import kinesisencryption.utils.KinesisEncryptionUtils;
 
+/**
+ * Decrypts records received from the stream and prints to stdout
+ */
+
 public class DecryptShardConsumerThread implements Runnable {
 	private String shardIterator;
 	private String shardId;
