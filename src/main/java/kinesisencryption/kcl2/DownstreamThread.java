@@ -4,18 +4,12 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amazonaws.encryptionsdk.AwsCrypto;
-import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.Record;
-import com.amazonaws.services.kms.AWSKMSClient;
-
-import kinesisencryption.utils.KinesisEncryptionUtils;
 
 /**
  * Thread used for decrypting and printing consumed records to the logs

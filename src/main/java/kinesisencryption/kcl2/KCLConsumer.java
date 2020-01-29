@@ -7,7 +7,6 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorF
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.InitialPositionInStream;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.Worker;
-import kinesisencryption.kcl.EncryptedKCLRecordProcessorFactory;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

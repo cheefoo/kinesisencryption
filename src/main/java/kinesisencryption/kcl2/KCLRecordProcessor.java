@@ -1,11 +1,7 @@
 package kinesisencryption.kcl2;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import kinesisencryption.kcl.RecordPrinterThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +12,6 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessor;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorCheckpointer;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.ShutdownReason;
 import com.amazonaws.services.kinesis.model.Record;
-
-import kinesisencryption.utils.KinesisEncryptionUtils;
 
 /**
  * A KCL RecordProcessor that processes server-side encrypted Kinesis records
@@ -44,7 +38,7 @@ public class KCLRecordProcessor implements IRecordProcessor {
     public void processRecords(List<Record> recordList, IRecordProcessorCheckpointer iRecordProcessorCheckpointer) {
         if (recordList.size() > 0) {
             log.info("Received record size is : " + recordList.size());
-            DownstreamThread printer = new DownstreamThread(recordList);
+            S3ArchiverThread printer = new S3ArchiverThread(recordList);
             Thread thread = new Thread(printer);
             thread.start();
         }
