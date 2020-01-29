@@ -111,7 +111,7 @@ public class EncryptedProducerWithKPL {
 					// Adding the encrypted record to stream
 					ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, randomPartitionKey(),
 							data);
-					Futures.addCallback(f, callback);
+					//Futures.addCallback(f, callback);
 					log.info("Encrypted record " + data.toString() + " " + "added successfully");
 				}
 				tickerObjectList = encryptedProducerWithKPLProducer.getTickerSymbolList();
