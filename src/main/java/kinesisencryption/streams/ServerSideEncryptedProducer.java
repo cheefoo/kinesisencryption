@@ -40,7 +40,6 @@ public class ServerSideEncryptedProducer
          */
         try {
 
-
             String streamName = KinesisEncryptionUtils.getProperties().getProperty("stream_name");
             log.info("Successfully retrieved stream name property " + streamName);
             String keyId = KinesisEncryptionUtils.getProperties().getProperty("key_id");
