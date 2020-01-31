@@ -4,7 +4,6 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kms.AWSKMSClient;
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -16,7 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,7 +30,7 @@ public class TestEncryptionSDK extends TestCase
     String keyId;
 
     AWSKMSClient kms;
-    final static String keyArn = "arn:aws:kms:us-east-1:xxxxxxx:key/mykey-3f1c-4a77-a51d-isinaws";
+    final static String keyArn = "arn:aws:kms:us-west-2:573906581002:key/9f6ccb9d-48b7-442a-a0f8-749efe26302c";
     final AwsCrypto crypto = new AwsCrypto();
     final KmsMasterKeyProvider prov = new KmsMasterKeyProvider(keyArn);
 
@@ -40,7 +38,7 @@ public class TestEncryptionSDK extends TestCase
     {
         super.setUp();
         car = new BootCarObject("Volvo 740 GL", "2012","134000");
-        keyId="mykey-3f1c-4a77-a51d-isinaws";
+        keyId="9f6ccb9d-48b7-442a-a0f8-749efe26302c";
 
         kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain()
                 .getCredentials()).withRegion(Regions.US_EAST_1);

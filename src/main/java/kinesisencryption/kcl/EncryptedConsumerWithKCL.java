@@ -10,6 +10,7 @@ import com.amazonaws.services.kinesis.clientlibrary.lib.worker.Worker;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.codeguruprofilerjavaagent.Profiler;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -45,7 +46,9 @@ public class EncryptedConsumerWithKCL {
 		KinesisClientLibConfiguration kinesisClientLibConfiguration = new KinesisClientLibConfiguration(appName,
 				streamName, credentialsProvider, workerId);
 		kinesisClientLibConfiguration.withInitialPositionInStream(INITIAL_POSITION_IN_STREAM).withRegionName(ddbRegion);
-
+		new Profiler.Builder()
+				.profilingGroupName("one1")
+				.build().start();
 		IRecordProcessorFactory recordProcessorFactory = new EncryptedKCLRecordProcessorFactory();
 		Worker worker = new Worker(recordProcessorFactory, kinesisClientLibConfiguration);
 

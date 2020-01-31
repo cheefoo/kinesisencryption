@@ -1,24 +1,22 @@
 package kinesisencryption.streams;
 
+import com.amazonaws.encryptionsdk.AwsCrypto;
+import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
+import com.amazonaws.services.kinesis.AmazonKinesis;
+import com.amazonaws.services.kinesis.model.GetRecordsRequest;
+import com.amazonaws.services.kinesis.model.GetRecordsResult;
+import com.amazonaws.services.kinesis.model.Record;
+import com.amazonaws.services.kms.AWSKMSClient;
+import kinesisencryption.utils.KinesisEncryptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.amazonaws.encryptionsdk.AwsCrypto;
-import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
-import com.amazonaws.services.kinesis.model.GetRecordsRequest;
-import com.amazonaws.services.kinesis.model.GetRecordsResult;
-import com.amazonaws.services.kinesis.model.Record;
-import com.amazonaws.services.kms.AWSKMSClient;
-
-import kinesisencryption.utils.KinesisEncryptionUtils;
 
 /**
  * Decrypts records received from the stream and prints to stdout
@@ -27,15 +25,15 @@ import kinesisencryption.utils.KinesisEncryptionUtils;
 public class DecryptShardConsumerThread implements Runnable {
 	private String shardIterator;
 	private String shardId;
-	private AmazonKinesisClient kinesis;
+	private AmazonKinesis kinesis;
 	private AWSKMSClient kms;
 	private Map<String, String> context;
 	private String keyArn;
 	private final static CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 	private static final Logger log = LoggerFactory.getLogger(DecryptShardConsumerThread.class);
 
-	public DecryptShardConsumerThread(String shardIterator, String shardId, AmazonKinesisClient kinesis,
-			Map<String, String> context, String keyArn) {
+	public DecryptShardConsumerThread(String shardIterator, String shardId, AmazonKinesis kinesis,
+									  Map<String, String> context, String keyArn) {
 		this.shardIterator = shardIterator;
 		this.shardId = shardId;
 		this.context = context;
@@ -60,7 +58,7 @@ public class DecryptShardConsumerThread implements Runnable {
 		return kms;
 	}
 
-	public AmazonKinesisClient getKinesis() {
+	public AmazonKinesis getKinesis() {
 		return kinesis;
 	}
 

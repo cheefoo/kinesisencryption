@@ -1,20 +1,25 @@
 package kinesisencryption.streams;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.*;
 import com.amazonaws.encryptionsdk.AwsCrypto;
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider;
+import com.amazonaws.services.kinesis.AmazonKinesis;
+import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
-import com.amazonaws.services.kms.AWSKMSClient;
+import com.amazonaws.services.kms.AWSKMS;
+import com.amazonaws.services.kms.AWSKMSClientBuilder;
 import kinesisencryption.dao.TickerSalesObject;
 import kinesisencryption.utils.KinesisEncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.codeguruprofilerjavaagent.Profiler;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.services.kinesis.AmazonKinesisClient;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class EncryptedProducerWithStreams {
 
@@ -30,13 +35,18 @@ public class EncryptedProducerWithStreams {
 	}
 
 	public static void main(String[] args) {
-		AmazonKinesisClient kinesis = new AmazonKinesisClient(
-				new DefaultAWSCredentialsProviderChain().getCredentials());
-		AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain().getCredentials());
+		/*AmazonKinesisClient kinesis = new AmazonKinesisClient(
+				new DefaultAWSCredentialsProviderChain().getCredentials());*/
+		AmazonKinesis kinesis = AmazonKinesisClientBuilder.standard().build();
+		/*AWSKMSClient kms = new AWSKMSClient(new DefaultAWSCredentialsProviderChain().getCredentials());*/
+		AWSKMS kms = AWSKMSClientBuilder.standard().build();
 		String keyArn = null;
 		String encryptionContext = null;
 		final AwsCrypto crypto = new AwsCrypto();
 
+		new Profiler.Builder()
+				.profilingGroupName("one1")
+				.build().start();
 		/*
 		 * Simulating the appearance of a steady flow of data by continuously
 		 * loading data from file
@@ -53,10 +63,10 @@ public class EncryptedProducerWithStreams {
 			log.info("Successfully retrieved key id property " + keyId);
 			String kinesisEndpoint = KinesisEncryptionUtils.getProperties().getProperty("kinesis_endpoint");
 			log.info("Successfully retrieved kinesis endpoint property " + kinesisEndpoint);
-			kinesis.setEndpoint(kinesisEndpoint);
+			//kinesis.setEndpoint(kinesisEndpoint);
 			String kmsEndpoint = KinesisEncryptionUtils.getProperties().getProperty("kms_endpoint");
 			log.info("Successfully retrieved kms endpoint property " + kmsEndpoint);
-			kms.setEndpoint(kmsEndpoint);
+			//kms.setEndpoint(kmsEndpoint);
 			String fileLocation = KinesisEncryptionUtils.getProperties().getProperty("file_path");
 			log.info("Successfully retrieved file location  property " + fileLocation);
 
